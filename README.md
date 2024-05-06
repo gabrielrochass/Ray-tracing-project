@@ -1,2 +1,9 @@
 # Ray-tracing-project
-Projeto da disciplina de Processamento Gráfico lecionada pelo professor Silvio Melo no Centro de Informática da UFPE.
+O projeto será dividido em ***seis entregas,*** que consistem em: ***implementar um ray-tracer básico, interseção com malhas de triângulos, transformações afins, modelo de iluminação de phong, ray-tracer recursivo e por fim a(s) feature(s) extra(s)***; Cada entrega será corrigida individualmente e a avaliação também será individual. Na pagina de cada entrega é possível ver mais detalhes a respeito.
+
+Tenha em mente que toda vez que nos referimos a ***pontos ou vetores*** nessa especificação, nos referimos a ***duas estruturas de dados compostas por 3 coordenadas (x, y, z), podendo ser floats ou doubles (recomendamos double para evitar erros de precisão e arredondamento de casas decimais).*** Tente usar apenas um dos dois tipos por toda a sua aplicação (floats ou double). Além disso, a ***cor RGB*** é formada por 3 parâmetros, um para o vermelho (R), um para o verde (G) e um para o azul (B), ***você pode armazenar essa cor em um vetor com 3 coordenadas***; porém, 0 ⩽ R, G, B ⩽ 255, podendo ser *floats* ou *doubles* (de novo só pra reforçar). ***Criem um repositório no github para gerenciar o projeto e facilitar a nossa correção.***
+
+***OBS:***  é extremamente recomendado que vocês usem C++. Todo material de suporte é baseado em C++ e a linguagem oferece *operator overloading*, que se mostrará muito útil para trabalhar com pontos, vetores e transformações afins. (Apesar disso, não é obrigatório, o verdadeiro ray-tracing são os amigos que fazemos no caminho).
+
+## Links importantes:
+- Especificação (Notion): https://short-crustacean-7e9.notion.site/71c2663a94304d629d33a8f289a7017e?v=96ba08a6ebe647e3aa5339ea8e019f3b
