@@ -1,50 +1,47 @@
 #include <iostream>
-#include <C:\Users\gabri\Downloads\eigen-3.4.0\eigen-3.4.0\Eigen\Core>
 using namespace std;
-using namespace Eigen;
 
 // Define a estrutura Ponto
 struct Ponto {
-    Vector3d coordenadas;
-    Ponto(double x, double y, double z) : coordenadas(x, y, z) {} // Construtor -> inicializa os valores de x, y e z
+    double x, y, z;
+    Ponto(double x, double y, double z) : x(x), y(y), z(z) {} // Construtor -> inicializa os valores de x, y e z
 };
 
 // Define operações com pontos
 Ponto soma(const Ponto& p1, const Ponto& p2) {
-    Vector3d somatorio = p1.coordenadas + p2.coordenadas;
-    return Ponto(somatorio(0), somatorio(1), somatorio(2));
+    return Ponto(p1.x + p2.x, p1.y + p2.y, p1.z + p2.z);
 }
 
 Ponto subtracao(const Ponto& p1, const Ponto& p2) {
-    Vector3d subtraido = p1.coordenadas - p2.coordenadas;
-    return Ponto(subtraido(0), subtraido(1), subtraido(2));
+    return Ponto(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
 }
 
 Ponto multiplicacaoPorEscalar(const Ponto& p, double escalar) {
-    Vector3d multiplicacao_vetor = p.coordenadas * escalar;
-    return Ponto(multiplicacao_vetor(0), multiplicacao_vetor(1), multiplicacao_vetor(2));
+    return Ponto(p.x * escalar, p.y * escalar, p.z * escalar);
 }
 
 double produtoEscalar(const Ponto& p1, const Ponto& p2) {
-    return p1.coordenadas.dot(p2.coordenadas);
+    return p1.x * p2.x + p1.y * p2.y + p1.z * p2.z;
 }
 
 Ponto produtoVetorial(const Ponto& p1, const Ponto& p2) {
-    Vector3d produto_vetorial = p1.coordenadas.cross(p2.coordenadas);
-    return Ponto(produto_vetorial(0), produto_vetorial(1), produto_vetorial(2));
+    return Ponto(p1.y * p2.z - p1.z * p2.y,
+                 p1.z * p2.x - p1.x * p2.z,
+                 p1.x * p2.y - p1.y * p2.x);
 }
 
 int main() {
     Ponto p1 = Ponto(1, 2, 3); // Ponto (1, 2, 3)
     Ponto p2 = Ponto(1, 1, 1);
-    cout << p1.coordenadas << endl; // Imprime 1 2 3
+    cout << "Coordenadas de p1: " << p1.x << " " << p1.y << " " << p1.z << endl; // Imprime 1 2 3
+    cout << "Coordenadas de p2: " << p2.x << " " << p2.y << " " << p2.z << endl;
 
-//    testando operações com pontos
-    cout << soma(p1, p2).coordenadas << endl;
-    cout << subtracao(p1, p2).coordenadas << endl;
-    cout << multiplicacaoPorEscalar(p2, 2).coordenadas << endl;
-    cout << produtoEscalar(p1,p2) << endl;
-    cout << produtoVetorial(p1,p2).coordenadas << endl;
+    // Testando operações com pontos
+    cout << "Soma: " << soma(p1, p2).x << " " << soma(p1, p2).y << " " << soma(p1, p2).z << endl;
+    cout << "Subtracao: " << subtracao(p1, p2).x << " " << subtracao(p1, p2).y << " " << subtracao(p1, p2).z << endl;
+    cout << "Multiplicacao por Escalar: " << multiplicacaoPorEscalar(p2, 2).x << " " << multiplicacaoPorEscalar(p2, 2).y << " " << multiplicacaoPorEscalar(p2, 2).z << endl;
+    cout << "Produto Escalar: " << produtoEscalar(p1, p2) << endl;
+    cout << "Produto Vetorial: " << produtoVetorial(p1, p2).x << " " << produtoVetorial(p1, p2).y << " " << produtoVetorial(p1, p2).z << endl;
 
     return 0;
 }
