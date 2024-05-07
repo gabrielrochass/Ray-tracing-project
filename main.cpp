@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 // Define a estrutura Ponto
@@ -29,6 +30,27 @@ Ponto produtoVetorial(const Ponto& p1, const Ponto& p2) {
                  p1.z * p2.x - p1.x * p2.z,
                  p1.x * p2.y - p1.y * p2.x);
 }
+
+// Define o vetor
+struct Vetor {
+    double modulo, direcao, sentido;
+    Vetor(double modulo, double direcao, double sentido) : modulo(modulo), direcao(direcao), sentido(sentido) {} // Construtor -> inicializa os valores de módulo, direção e sentido
+};
+
+// soma de vetores na mesma direção
+
+// subtração de vetores na mesma direção
+
+// soma de vetores perpendiculares
+
+// subtração de vetores perpendiculares -> só muda o sentido da soma
+
+// soma de vetores oblíquos
+
+// subtração de vetores oblíquos -> só muda o sentido da soma
+
+// multiplicação por escalar
+
 
 int main() {
     Ponto p1 = Ponto(1, 2, 3); // Ponto (1, 2, 3)
