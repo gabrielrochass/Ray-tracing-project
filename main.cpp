@@ -43,6 +43,17 @@ struct vetor {
     }
 };
 
+// Função soma
+template<typename T>
+Vec3<T> soma(const Vec3<T>& v1, const Vec3<T>& v2) {
+    return Vec3<T>(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+}
+
+// Função subtração
+template<typename T>
+Vec3<T> subtracao(const Vec3<T>& v1, const Vec3<T>& v2) {
+    return Vec3<T>(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
 
 // Função norma
 template<typename T>
