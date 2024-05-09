@@ -36,7 +36,7 @@ template<typename T>
 struct vetor {
     T x, y, z;
 
-    void criar(T xRecebido, T yRecebido, T zRecebido) {
+     void criar(T xRecebido, T yRecebido, T zRecebido) {
         x = xRecebido;
         y = yRecebido;
         z = zRecebido;
@@ -45,14 +45,14 @@ struct vetor {
 
 // Função soma
 template<typename T>
-Vec3<T> soma(const Vec3<T>& v1, const Vec3<T>& v2) {
-    return Vec3<T>(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+vetor<T> soma(const vetor<T>& v1, const vetor<T>& v2) {
+    return vetor<T>(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 }
 
 // Função subtração
 template<typename T>
-Vec3<T> subtracao(const Vec3<T>& v1, const Vec3<T>& v2) {
-    return Vec3<T>(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+vetor<T> subtracao(const vetor<T>& v1, const vetor<T>& v2) {
+    return vetor<T>(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
 }
 
 // Função norma
@@ -89,8 +89,8 @@ int main() {
     cout << "Produto Vetorial: " << produtoVetorial(p1, p2).x << " " << produtoVetorial(p1, p2).y << " " << produtoVetorial(p1, p2).z << endl;
 
     // Testando operações com vetores
-    vetor<double> v1(3.0, 4.0, 0.0);
-    vetor<double> v2(0.6, 0.8, 0.0);
+    vetor<double> v1(1.0, 0.0, 0.0);
+    vetor<double> v2(0.0, 1.0, 0.0);
     
     double normV1 = norma(v1);
     double normV2 = norma(v2);
@@ -105,5 +105,6 @@ int main() {
     std::cout << "Produto escalar de v1 e v2: " << dotProduct << std::endl;
     std::cout << "Vetor unitário de v1: (" << unitV1.x << ", " << unitV1.y << ", " << unitV1.z << ")" << std::endl;
 
+   
     return 0;
 }
