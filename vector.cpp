@@ -91,26 +91,27 @@ public:
                u(produtoVetorial(horizontal, w)),
                v(produtoVetorial(w,u)),
                distanciaFocal(1.0) {
-        w = vetorUni(subtracao(origem, horizontal));
+        w = vetorUni(subtracao(origem, apontarPara));
     }
 
     // Construtor personalizado
     camera(const vetor<T>& origin, const vetor<T>& lookAt,
            const vetor<T>& up, T aperture = 0.0, T focusDist = 1.0)
-            : origem(origin),
-              apontarPara(lookAt),
-              distanciaFocal(focusDist) {
-        w = (origem - apontarPara).vetorUni();
-        u = up.produtoVetorial(w).vetorUni();
-        v = w.produtoVetorial(u);
-        horizontal = u.multiplicacaoPorEscalar(4.0 * focusDist);
-        vertical = v.multiplicacaoPorEscalar(2.0 * focusDist);
-        extremidadeInferiorEsquerda = origem
-                .subtracao(horizontal.multiplicacaoPorEscalar(0.5))
-                .subtracao(vertical.multiplicacaoPorEscalar(0.5))
-                .subtracao(w.multiplicacaoPorEscalar(focusDist));
+        : origem(origin),
+          apontarPara(lookAt),
+          distanciaFocal(focusDist) {
+        w = vetorUni(subtracao(origem, apontarPara));
+        u = vetorUni(produtoVetorial(up, w));
+        v = produtoVetorial(w, u);
+        horizontal = multiplicacaoPorEscalar(u , 4.0 * focusDist);
+        vertical = multiplicacaoPorEscalar(v, 2.0 * focusDist);
+        extremidadeInferiorEsquerda = (
+                                      subtracao(origem, multiplicacaoPorEscalar(0.5, horizontal)),
+                                      subtracao(origem, multiplicacaoPorEscalar(0.5, vertical)),
+                                      subtracao(origem, multiplicacaoPorEscalar(focusDist, w))
+                                      );
     }
-
+    
     // Método para obter um raio da câmera
     raio<double> getRaio(double u, double v) {
         // Calcula a direção do raio usando os parâmetros u e v
