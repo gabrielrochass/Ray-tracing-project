@@ -1,5 +1,6 @@
 #include <iostream>
 #include "cmath"
+
 using namespace std;
 
 // Criando estrutura vetor
@@ -7,11 +8,11 @@ template<typename T> //carregar mais de um tipo de dados
 struct vetor {
     T x, y, z;
 
-    void criar(T xRecebido, T yRecebido, T zRecebido) { // Construtor do vetor
-        x = xRecebido;
-        y = yRecebido;
-        z = zRecebido;
-    }
+    // Construtor do vetor
+    vetor(T xRecebido, T yRecebido, T zRecebido) : x(xRecebido), y(yRecebido), z(zRecebido) {}
+
+    // Construtor padrão (inicializa com zero)
+    vetor() : x(0), y(0), z(0) {}
 
 
 };
@@ -43,10 +44,13 @@ T produtoEscalar(const vetor<T>& v1, const vetor<T>& v2) {
 // Função Vetor unitário
 template<typename T>
 vetor<T> vetorUni(const vetor<T>& v) {
+    T norm = norma(v);
+    
 
-    return vetor<T>(v.x / norma(v), v.y / norma(v), v.z / norma(v));
-
+    return  vetor<T> (v.x / norm, v.y / norm, v.z / norm);;
 };
+
+
 
 // Função Produto Vetorial
 template<typename T>
@@ -54,9 +58,13 @@ vetor<T> produtoVetorial(const vetor<T>& v1, const vetor<T>& v2) {
     return vetor<T>(v1.y * v2.z - v1.z * v2.y,
                     v1.z * v2.x - v1.x * v2.z,
                     v1.x * v2.y - v1.y * v2.x);
-};
+}
 
-
+// Função multiplicação por escalar
+template<typename T>
+vetor<T> multiplicacaoPorEscalar(const vetor<T>& v, T escalar) {
+    return vetor<T>(v.x * escalar, v.y * escalar, v.z * escalar);
+}
 
 template<typename T>
 struct raio {
@@ -81,49 +89,42 @@ public:
     T lenteR;
     T distanciaFocal;
 
-
     // Construtor padrão
     camera() : origem(0.0, 0.0, 0.0),
                apontarPara(0.0, 0.0, -1.0),
-               horizontal(4.0, 0.0, 0.0),
-               vertical(0.0, 2.0, 0.0),
-               extremidadeInferiorEsquerda(-2.0, -1.0, -1.0),
-               u(produtoVetorial(horizontal, w)),
-               v(produtoVetorial(w,u)),
-               distanciaFocal(1.0) {
+               distanciaFocal(1.0),
+               lenteR(0.0) {
+        // Calcula o vetor de direção w (apontando de origem para apontarPara)
         w = vetorUni(subtracao(origem, apontarPara));
-    }
 
-    // Construtor personalizado
-    camera(const vetor<T>& origin, const vetor<T>& lookAt,
-           const vetor<T>& up, T aperture = 0.0, T focusDist = 1.0)
-        : origem(origin),
-          apontarPara(lookAt),
-          distanciaFocal(focusDist) {
-        w = vetorUni(subtracao(origem, apontarPara));
+        // Calcula os vetores u e v usando up e w
+        vetor<T> up(0.0, 1.0, 0.0); // Vetor up padrão
         u = vetorUni(produtoVetorial(up, w));
         v = produtoVetorial(w, u);
-        horizontal = multiplicacaoPorEscalar(u , 4.0 * focusDist);
-        vertical = multiplicacaoPorEscalar(v, 2.0 * focusDist);
-        extremidadeInferiorEsquerda = (
-                                      subtracao(origem, multiplicacaoPorEscalar(0.5, horizontal)),
-                                      subtracao(origem, multiplicacaoPorEscalar(0.5, vertical)),
-                                      subtracao(origem, multiplicacaoPorEscalar(focusDist, w))
-                                      );
+
+        // Calcula os vetores horizontal e vertical com base na distância focal
+        horizontal = multiplicacaoPorEscalar(u, 4.0 * distanciaFocal);
+        vertical = multiplicacaoPorEscalar(v, 2.0 * distanciaFocal);
+
+        // Calcula a extremidade inferior esquerda da tela
+        vetor<T> half_horizontal = multiplicacaoPorEscalar(horizontal, 0.5);
+        vetor<T> half_vertical = multiplicacaoPorEscalar(vertical, 0.5);
+        extremidadeInferiorEsquerda = subtracao(subtracao(subtracao(origem, half_horizontal), half_vertical), w);
     }
-    
+
     // Método para obter um raio da câmera
-    raio<double> getRaio(double u, double v) {
-        // Calcula a direção do raio usando os parâmetros u e v
-        vetor<T> direcao = soma(soma(extremidadeInferiorEsquerda, vetor<T>(u, v, 0.0)), origem);
-        return raio<T>(origem, vetorUni(direcao));
+    raio<T> getRaio(double uVal, double vVal) const {
+        // Calcula a direção do raio usando os parâmetros uVal e vVal
+        vetor<T> direction = soma(soma(extremidadeInferiorEsquerda, multiplicacaoPorEscalar(horizontal, uVal)),
+                                   soma(multiplicacaoPorEscalar(vertical, vVal), origem));
+        return raio<T>(origem, vetorUni(direction));
     }
 };
 
 int main() {
     // Testando operações com vetores
-    vetor<double> v1(1.0, 0.0, 0.0);
-    vetor<double> v2(0.0, 1.0, 0.0);
+    vetor<double> v1{1.0, 0.0, 0.0};
+    vetor<double> v2{0.0, 1.0, 0.0};
 
     double normV1 = norma(v1);
     double normV2 = norma(v2);
@@ -133,10 +134,10 @@ int main() {
     vetor<double> unitV1 = vetorUni(v1);
 
 
-    cout << "Norma de v1: " << normV1 << endl;
-    cout << "Norma de v2: " << normV2 << endl;
-    cout << "Produto escalar de v1 e v2: " << dotProduct << endl;
-    cout << "Vetor unitário de v1: (" << unitV1.x << ", " << unitV1.y << ", " << unitV1.z << ")" << endl;
+    std::cout << "Norma de v1: " << normV1 << std::endl;
+    std::cout << "Norma de v2: " << normV2 << std::endl;
+    std::cout << "Produto escalar de v1 e v2: " << dotProduct << std::endl;
+    std::cout << "Vetor unitário de v1: (" << unitV1.x << ", " << unitV1.y << ", " << unitV1.z << ")" << std::endl;
 
     // Criando uma câmera
     camera<double> minhaCamera;
@@ -145,8 +146,8 @@ int main() {
     raio<double> meuRaio = minhaCamera.getRaio(0.5, 0.5);
 
     // Exibindo as informações do raio
-    cout  << "Origem do raio: (" << meuRaio.origem.x << ", " << meuRaio.origem.y << ", " << meuRaio.origem.z << ")" <<  endl;
-    cout  << "Direção do raio: (" << meuRaio.direcao.x << ", " << meuRaio.direcao.y << ", " << meuRaio.direcao.z << ")" <<  endl;
+    std::cout  << "Origem do raio: (" << meuRaio.origem.x << ", " << meuRaio.origem.y << ", " << meuRaio.origem.z << ")" <<  std::endl;
+    std::cout  << "Direção do raio: (" << meuRaio.direcao.x << ", " << meuRaio.direcao.y << ", " << meuRaio.direcao.z << ")" << std:: endl;
 
 
     return 0;
