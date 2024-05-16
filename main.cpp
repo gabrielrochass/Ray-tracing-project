@@ -26,7 +26,7 @@ bool hit(const vetor<T>& center, T radius, const raio<T>& raio) {
     T rr = radius * radius;
     T oocc = produtoEscalar(oc, oc);
     //vetor<T> c = subtracaoVP(rr, oocc);
-    vetor<T> c =  vetor<T>(oocc, rr, 00)occ, rr, 0.0);
+    vetor<T> c{oocc, rr, 0.0};
     T bb = 2.0 *  b;
     vetor<T> ac = mult(a, c);
     vetor<T> ac4 = mult(4.0, ac);
