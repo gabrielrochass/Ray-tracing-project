@@ -1,5 +1,8 @@
 #include <iostream>
-#include "cmath"
+#include <cmath>
+
+#ifndef VECTOR_H
+#define VECTOR_H
 
 using namespace std;
 
@@ -33,7 +36,7 @@ T norma(const vetor<T>& vector) {
 template<typename T>
 T produtoEscalar(const vetor<T>& v1, const vetor<T>& v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-};
+}; // retorna double 
 
 // Função Vetor unitário
 template<typename T>
@@ -41,8 +44,6 @@ vetor<T> vetorUni(const vetor<T>& v) {
     T norm = norma(v);
     return  vetor<T> (v.x / norm, v.y / norm, v.z / norm);;
 };
-
-
 
 // Função Produto Vetorial
 template<typename T>
@@ -69,8 +70,9 @@ struct raio {
     }
 };
 
+#endif // VECTOR_H
 
-int main2() {
+/*int main2() {
     // Testando operações com vetores
     vetor <double> v1{1.0, 0.0, 0.0};
     vetor <double> v2{0.0, 1.0, 0.0};
@@ -92,4 +94,4 @@ int main2() {
 
 
     return 0;
-}
+}*/

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <cmath>
-#include "ponto.cpp"
-#include "vector.cpp"
+#include "ponto.h"
+#include "vector.h"
 
 using namespace std;
 
-template<typename T>
+/*template<typename T>
 class camera {
 public:
     vetor<T> origem;
@@ -30,7 +30,7 @@ public:
         v (Orientação Vertical): Define a direção vertical da câmera em relação à sua direção de visão.*/
         
         // Calcula os vetores u e v usando up e w
-        vetor<T> up(0.0, 1.0, 0.0); // Vetor up padrão
+      /*  vetor<T> up(0.0, 1.0, 0.0); // Vetor up padrão
         u = vetorUni(produtoVetorial(up, w));
         v = produtoVetorial(w, u);
 
@@ -68,8 +68,8 @@ int main() {
     return 0;
 }
 
-/*// Criando uma câmera
-    camera<double> minhaCamera;
+/* Criando uma câmera
+   /*camera<double> minhaCamera;
 
     // Obtendo um raio da câmera com parâmetros u = 0.5 e v = 0.5
     raio<double> meuRaio = minhaCamera.getRaio(0.5, 0.5);
