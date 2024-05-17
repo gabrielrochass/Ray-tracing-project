@@ -25,25 +25,9 @@ double hit(const vetor<T>& center, T radius, const raio<T>& raio) {
     }
 }
 
-template<typename T>
-<<<<<<< HEAD
-=======
-bool hit(const vetor<T>& center, T radius, const raio<T>& raio) {
-    double a = produtoEscalar(raio.direcao, raio.direcao);
-    vetor<T> oc = subtracao(center, raio.origem);
-    double b = 2.0 * produtoEscalar(raio.direcao, oc);
-    double c = produtoEscalar(oc, oc) - radius * radius;
-    double discriminant = b * b - 4 * a * c;
-
-    if (discriminant <= 0) {
-        return false;
-    } else {
-        return true;
-    }
-}
 
 template<typename T>
->>>>>>> 0048ea92e9b54ec50ba20981655514d9a7faeb1b
+
 vetor<T> backgroundColor(const vetor<T>& dir) {
     T t = 0.5 * (dir.y + 1.0);
     return vetor<T>((1 - t) * 1.0 + t * 0.5,
@@ -54,21 +38,22 @@ vetor<T> backgroundColor(const vetor<T>& dir) {
 template<typename T>
 // Function to compute color of the raio
 vetor<T> raioColor(const raio<T>& raio, const vetor<T>& sphereCenter, T sphereRadius) {
-<<<<<<< HEAD
+
     double t = hit(sphereCenter, sphereRadius, raio);
     if (t > 0.0) {
         vetor<T> p = raioAt(raio, t);
         vetor<T> N = vetorUni(subtracao(p, sphereCenter));
         vetor<T> color = mult(0.5, soma(vetor<T>(1.0, 1.0, 1.0), N));
         return color; 
-=======
+    }
     if (hit(sphereCenter, sphereRadius, raio)) {
         return vetor<T>(1.0, 0.0, 0.0); 
->>>>>>> 0048ea92e9b54ec50ba20981655514d9a7faeb1b
+
     }
 
     return backgroundColor(raio.direcao);
 }
+
 
  
 int main() {
