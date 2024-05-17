@@ -7,63 +7,25 @@
 
 using namespace std;
 
-template<typename T> 
-vetor<T> mult(T scalar, vetor<T> h) {
-    return vetor<T>(h.x * scalar, h.y * scalar, h.z * scalar);
-}
 
-template<typename T> 
-vetor<T> subtracaoVP(T scalar, vetor<T> h) {
-    return vetor<T>(h.x - scalar, h.y - scalar, h.z - scalar);
-}
 
 template<typename T>
-bool hit(const vetor<T>& center, T radius, const raio<T>& raio) {
+double hit(const vetor<T>& center, T radius, const raio<T>& raio) {
     double a = produtoEscalar(raio.direcao, raio.direcao);
     vetor<T> oc = subtracao(center, raio.origem);
+    double metadeb = produtoEscalar(raio.direcao, oc);
     double b = 2.0 * produtoEscalar(raio.direcao, oc);
     double c = produtoEscalar(oc, oc) - radius * radius;
-    double discriminant = b * b - 4 * a * c;
+    double discriminant = metadeb * metadeb -  a * c;
 
-    if (discriminant <= 0) {
-        return false;
+    if (discriminant < 0) {
+        return -1.0;
     } else {
-        return true;
+        return (-metadeb - sqrt(discriminant)) /  a;
     }
 }
-
-/*bool intersec_esf(const vetor<double> centro, double raio, vetor<double> o, const vetor<double> v){
-    vetor<double> oc = subtracao(o, centro);
-    double a = produtoEscalar(v, v);
-    double b = 2.0 * produtoEscalar(oc, v);
-    double c = produtoEscalar(oc, oc) - raio * raio;
-    double discriminante = b * b - 4 * a * c;
-    return (discriminante > 0);
-}
-*/
-
-
-
-/*function Sphere(c::Vec3{T}, r::T) where T
-    Sphere{T}(c, r)
-end
-
-bool hit(const vetor<T>& center, T radius, const Ray& ray) {
-    double a = pow(norma(ray.direction),2);
-    vetor<T> oc = sphere.center - ray.origin;
-    double b = 2.0 * produtoEscalar(ray.direction, oc);
-    double c = pow(normsquared(oc),2) - radius * radius;
-    double discriminant = b * b - 4 * a * c;
-
-    if (discriminant <= 0) {
-        return false;
-    } else {
-        return true;
-    }
-}*/
 
 template<typename T>
-// Function to compute color based on the direction of the raio
 vetor<T> backgroundColor(const vetor<T>& dir) {
     T t = 0.5 * (dir.y + 1.0);
     return vetor<T>((1 - t) * 1.0 + t * 0.5,
@@ -74,8 +36,12 @@ vetor<T> backgroundColor(const vetor<T>& dir) {
 template<typename T>
 // Function to compute color of the raio
 vetor<T> raioColor(const raio<T>& raio, const vetor<T>& sphereCenter, T sphereRadius) {
-    if (hit(sphereCenter, sphereRadius, raio)) {
-        return vetor<T>(1.0, 0.0, 0.0); // Red color for hit
+    double t = hit(sphereCenter, sphereRadius, raio);
+    if (t > 0.0) {
+        vetor<T> p = raioAt(raio, t);
+        vetor<T> N = vetorUni(subtracao(p, sphereCenter));
+        vetor<T> color = mult(0.5, soma(vetor<T>(1.0, 1.0, 1.0), N));
+        return color; 
     }
 
     return backgroundColor(raio.direcao);
@@ -136,7 +102,7 @@ int main() {
     }
     
 
-    cout << "Image size " << imWidth << " x " << imHeight << endl;
+    
     clog << "\rDone.                 \n";
     return 0;
 }
