@@ -46,10 +46,7 @@ vetor<T> raioColor(const raio<T>& raio, const vetor<T>& sphereCenter, T sphereRa
         vetor<T> color = mult(0.5, soma(vetor<T>(1.0, 1.0, 1.0), N));
         return color; 
     }
-    if (hit(sphereCenter, sphereRadius, raio)) {
-        return vetor<T>(1.0, 0.0, 0.0); 
-
-    }
+    
 
     return backgroundColor(raio.direcao);
 }
