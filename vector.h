@@ -70,6 +70,22 @@ struct raio {
     }
 };
 
+template<typename T> 
+vetor<T> mult(T scalar, vetor<T> h) {
+    return vetor<T>(h.x * scalar, h.y * scalar, h.z * scalar);
+}
+
+template<typename T> 
+vetor<T> subtracaoVP(T scalar, vetor<T> h) {
+    return vetor<T>(h.x - scalar, h.y - scalar, h.z - scalar);
+}
+
+template<typename T>
+vetor<T> raioAt(raio<T> r, T t) {
+    
+    return soma(r.origem, mult(t, r.direcao));
+}
+
 #endif // VECTOR_H
 
 /*int main2() {
