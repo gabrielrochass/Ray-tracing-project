@@ -30,10 +30,12 @@ bool hitEsfera(const vetor<double>& centroDaEsfera, double raioDaEsfera, const r
 }
 
 // define se um raio intersecta ou não um plano -> retorna true se intersecta, false caso contrário
+// baseado na equação do plano -> n.(p - p0) = 0 -> onde n é a normal do plano, p é um ponto no plano e p0 é um ponto qualquer
 bool hitPlano(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raioDeInterseccao) {
     double denominador = produtoEscalar(normal, raioDeInterseccao.direcao);
 
     // Verifica se o denominador é zero para evitar divisão por zero
+    // fabs realiza o valor absoluto de um número
     if (fabs(denominador) < 1e-6) {
         return false; // Raio é paralelo ao plano
     }
@@ -48,26 +50,20 @@ bool hitPlano(const vetor<double>& pontoNoPlano, const vetor<double>& normal, co
 
 
 // Retorna a cor de um raio que intersecta uma esfera -> se não intersecta, retorna a cor de fundo
-
 template<typename T>
-// Function to compute color of the raio
 vetor<T> raioColor(const raio<T>& raio, const vetor<T>& sphereCenter, T sphereRadius) {
     double t = hitEsfera(sphereCenter, sphereRadius, raio);
-    // se o raio intersecta o plano, retorna a cor verde
-    vetor<T> pontoNoPlano{0.0, -1.25, -1.0};
-    vetor<T> normal{0.0, 0.0, 0.0};
+    // Se o raio intersectar a esfera, calcula a cor com base na normal da esfera
     if (t > 0.0) {
         vetor<T> p = raioAt(raio, t);
         vetor<T> N = vetorUni(subtracao(p, sphereCenter));
         vetor<T> color = mult(0.5, soma(vetor<T>(1.0, 1.0, 1.0), N));
         return color; 
     }
-    else if(hitEsfera({0.0, 2.0, -1.0}, 2.0, raio)) { 
+    // Se o raio intersectar o plano, retorna a cor verde
+    else if(hitPlano({0.0, -1.0, -1.0}, {0.0, 1.0, 0.0}, raio)) { 
         return vetor<T>(0.0, 1.0, 0.0);
     }
-    /*else if(hitPlano(pontoNoPlano, normal, raio)) { 
-        return vetor<T>(0.0, 1.0, 0.0);
-    }*/
 
     return backgroundColor(raio.direcao);
 }
@@ -80,6 +76,7 @@ int main() {
 
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
+    // define a câmera
     vetor origem{0.0, 0.0, 0.0};
     double viewportHeight = 2.0;
     double viewportWidth = viewportHeight * 16.0 / 9.0;
@@ -95,7 +92,9 @@ int main() {
     // define esfera
     vetor sphereCenter{0.0, 0.0, -1.0};
     double sphereRadius = 0.5;
-
+    
+    double vfov = 45.0;
+    Camera<double> camera(vfov);
 
     for (int j = 0; j < imHeight; ++j) {
         for (int i = 0; i < imWidth; ++i) {
@@ -113,7 +112,6 @@ int main() {
             image[j][i] = raioColor(raio, sphereCenter , sphereRadius);
         }
     }
-
 
     cout << "P3\n" << imWidth << " " << imHeight << "\n255\n";
     for (int j = 0; j < imHeight; ++j) {
