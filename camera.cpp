@@ -35,8 +35,7 @@ struct Camera {
     vetor<double> w, u, v;
     
     // construtor
-    Camera(const vetor<double>& posicaoDaCamera_, const vetor<double>& mira_, const vetor<double>& vUp_, double distanciaParaTela_, double larguraDaTela_, double alturadaTela_) : 
-    posicaoDaCamera(posicaoDaCamera_), mira(mira_), vUp(vUp_) {
+    Camera(const vetor<double>& posicaoDaCamera_, const vetor<double>& mira_, const vetor<double>& vUp_) : posicaoDaCamera(posicaoDaCamera_), mira(mira_), vUp(vUp_) {
         w = vetorUni(subtracao(mira, posicaoDaCamera));
         u = vetorUni(produtoVetorial(vUp, w));
         v = produtoVetorial(w, u);
@@ -46,9 +45,13 @@ struct Camera {
 
 // testando a classe Camera
 int main() {
-    Camera cam(vetor<double>(0, 0, 0), vetor<double>(0, 0, -1), vetor<double>(0, 1, 0), 1, 2, 2);
-    cout << "u: " << cam.u << endl;
-    cout << "v: " << cam.v << endl;
-    cout << "w: " << cam.w << endl;
+    vetor<double> posicaoDaCamera(0, 0, 0);
+    vetor<double> mira(0, 0, -1);
+    vetor<double> vUp(0, 1, 0);
+
+    Camera camera(posicaoDaCamera, mira, vUp);
+    cout << "u: " << camera.u << endl;
+    cout << "v: " << camera.v << endl;
+    cout << "w: " << camera.w << endl;
     return 0;
 }
