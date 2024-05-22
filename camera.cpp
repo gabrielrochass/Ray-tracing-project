@@ -12,7 +12,7 @@ using namespace std;
 // mira -> Ponto para onde a câmera está apontada
 // vUp -> vetor que indica a direção para cima da câmera 
 // vOrtonomais -> 3 vetores ortogonais entre si que definem a base da câmera
-// w -> direção oposta ao veor que vai de posicao para mira
+// w -> direção oposta ao vetor que vai de posicao para mira
 // u -> vetor perpendicular a w e vUp
 // v -> vetor perpendicular a u e w -> define o vetor para cima da câmera
 // distanciaParaTela -> distância da câmera para a tela
@@ -33,7 +33,7 @@ struct Camera {
     vetor<double> mira;
     vetor<double> vUp;
     vetor<double> w, u, v;
-    
+
     // construtor
     Camera(const vetor<double>& posicaoDaCamera_, const vetor<double>& mira_, const vetor<double>& vUp_) : posicaoDaCamera(posicaoDaCamera_), mira(mira_), vUp(vUp_) {
         w = vetorUni(subtracao(mira, posicaoDaCamera));
@@ -44,14 +44,4 @@ struct Camera {
 };
 
 // testando a classe Camera
-int main() {
-    vetor<double> posicaoDaCamera(0, 0, 0);
-    vetor<double> mira(0, 0, -1);
-    vetor<double> vUp(0, 1, 0);
 
-    Camera camera(posicaoDaCamera, mira, vUp);
-    cout << "u: " << camera.u << endl;
-    cout << "v: " << camera.v << endl;
-    cout << "w: " << camera.w << endl;
-    return 0;
-}

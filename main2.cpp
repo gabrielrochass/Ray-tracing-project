@@ -3,7 +3,7 @@
 #include <vector>
 #include "ponto.h"
 #include "vector.h"
-#include "camera.h"
+#include "camera.cpp"
 #include "sphere_list.h"
 #include "sphere.h"
 #include <limits>
@@ -32,8 +32,8 @@ double hit(const vetor<double>& center, double radius, const raio<double>& raio)
 vetor<double> backgroundColor(const vetor<double>& dir) {
     double t = 0.5 * (dir.y + 1.0);
     return vetor<double>((1 - t) * 1.0 + t * 0.5,
-                  (1 - t) * 1.0 + t * 0.7,
-                  (1 - t) * 1.0 + t * 1.0);
+                         (1 - t) * 1.0 + t * 0.7,
+                         (1 - t) * 1.0 + t * 1.0);
 }
 // define se um raio intersecta ou não um plano -> retorna true se intersecta, false caso contrário
 //  ax + by + cz + d = 0 -> equação do plano
@@ -54,7 +54,7 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
     if(mundo.hit(raio, 0, infinity, rec)){
         return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
     }
-    else if(hitPlano({0.0, -1.25, -1.0}, {0.0, 1.0, 0.0}, raio)) { 
+    else if(hitPlano({0.0, -1.25, -1.0}, {0.0, 1.0, 0.0}, raio)) {
         return vetor<double>(0.0, 1.0, 0.0);
     }
     vetor<double> direcao_uni = vetorUni(raio.direcao);
@@ -63,49 +63,46 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
 }
 
 
-
-
- 
 int main() {
+    // define a imagem
     const int imWidth = 801;
     const int imHeight = static_cast<int>(imWidth / (16.0 / 9.0));
-    
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
+    // define o mundo
     sphere_list mundo;
     //mundo.add(sphere(vetor<double>(0, -100.5, -1), 100));
-    mundo.add(sphere(vetor<double>(0, 0, -1), 0.5));  
-    mundo.add(sphere(vetor<double>(1, +100.5, -1), 100)); 
+    mundo.add(sphere(vetor<double>(0, 0, -1), 0.5));
+    mundo.add(sphere(vetor<double>(1, +100.5, -1), 100));
 
-    vetor<double> origem{0.0, 0.0, 0.0};
-    double viewportHeight = 2.0;
-    double viewportWidth = viewportHeight * 16.0 / 9.0;
-    vetor<double> horizontal{viewportWidth, 0.0, 0.0};
-    vetor<double> vertical{0.0, viewportHeight, 0.0};
-    vetor<double> h2 = mult(0.5, horizontal);
-    vetor<double> h2o = subtracao(origem, h2);
-    vetor<double> v2 = mult(0.5, vertical);
-    vetor<double> lente{0, 0, -1};
-    vetor<double> v2f = subtracao(v2, lente);
-    vetor<double> lowerLeftCorner = subtracao(h2o, v2f);
-    //vetor lowerLeftCorner = origem - horizontal/2 - vertical/2 - Vec3(0.0, 0.0, focallenght)
-;
-    
+    // define a câmera
+    vetor<double> posicaoDaCamera(0, 0, 0);
+    vetor<double> mira(0, 0, -1);
+    vetor<double> vUp(0, 1, 0);
+    Camera camera(posicaoDaCamera, mira, vUp);
+
+    // define a viewport
+    const vetor<double> larguraDaViewport(16.0, 0.0, 0.0);
+    const vetor<double> alturaDaViewport(0.0, 9.0, 0.0);
+
+    // define a esfera
     vetor<double> sphereCenter{0.0, 0.0, -1.0};
     double sphereRadius = 0.5;
-    
 
+    // define a cor do fundo
     for (int j = 0; j < imHeight; ++j) {
         for (int i = 0; i < imWidth; ++i) {
             double u = double(i) / (imWidth - 1);
             double v = 1.0 - double(j) / (imHeight - 1);
-            raio<double> r(origem, soma(lowerLeftCorner, soma(mult(u, horizontal), mult(v, vertical))));
+            
+            vetor<double> direcaoDoRaio = soma(camera.posicaoDaCamera, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport)));
+            raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             vetor<double> color = raioColor(r, mundo);
-            image[j][i] = color; 
+            image[j][i] = color;
         }
     }
 
-    
+    // output
     cout << "P3\n" << imWidth << " " << imHeight << "\n255\n";
     for (int j = 0; j < imHeight; ++j) {
         for (int i = 0; i < imWidth; ++i) {
@@ -115,9 +112,9 @@ int main() {
             cout << ir << " " << ig << " " << ib << "\n";
         }
     }
-    
 
-    
+
+
     clog << "\rDone.                 \n";
     return 0;
 }
