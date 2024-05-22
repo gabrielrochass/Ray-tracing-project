@@ -3,7 +3,7 @@
 #include <vector>
 #include "ponto.h"
 #include "vector.h"
-#include "camera.cpp"
+#include "camera.h"
 #include "sphere_list.h"
 #include "sphere.h"
 #include <limits>
