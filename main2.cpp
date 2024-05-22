@@ -35,6 +35,18 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                   (1 - t) * 1.0 + t * 0.7,
                   (1 - t) * 1.0 + t * 1.0);
 }
+// define se um raio intersecta ou não um plano -> retorna true se intersecta, false caso contrário
+//  ax + by + cz + d = 0 -> equação do plano
+bool hitPlano(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raioDeInterseccao) {
+    double denominador = produtoEscalar(normal, raioDeInterseccao.direcao); // usado pra determinar se o raio é paralelo ao plano
+    // Verifica se o denominador é zero para evitar divisão por zero
+    if (fabs(denominador) < 1e-6) { // 0
+        return false; // Raio é paralelo ao plano -> não intersecta
+    }
+    // Calcula a distância para o ponto de interseção ao longo do raio
+    double t = -produtoEscalar(subtracao(raioDeInterseccao.origem, pontoNoPlano), normal) / denominador;
+    return t >= 0; // Se t for maior ou igual a zero, o raio intersecta o plano
+} //**************
 
 // Function to compute color of the raio
 vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
@@ -42,10 +54,15 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
     if(mundo.hit(raio, 0, infinity, rec)){
         return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
     }
+    else if(hitPlano({0.0, -1.25, -1.0}, {0.0, 1.0, 0.0}, raio)) { 
+        return vetor<double>(0.0, 1.0, 0.0);
+    }
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     auto t = 0.5 * (direcao_uni.y + 1.0);
     return soma(multiplicacaoPorEscalar(vetor<double>(1.0, 1.0, 1.0), 1.0 - t), multiplicacaoPorEscalar(vetor<double>(0.5, 0.7, 1.0), t));
 }
+
+
 
 
  
@@ -56,7 +73,7 @@ int main() {
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
     sphere_list mundo;
-    mundo.add(sphere(vetor<double>(0, -100.5, -1), 100));
+    //mundo.add(sphere(vetor<double>(0, -100.5, -1), 100));
     mundo.add(sphere(vetor<double>(0, 0, -1), 0.5));  
     mundo.add(sphere(vetor<double>(1, +100.5, -1), 100)); 
 
