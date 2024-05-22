@@ -5,7 +5,7 @@
 
 using namespace std;
 
-// Classe Camera
+// Estrutura Camera
 // câmera móvel -> pode ser posicionada em qualquer lugar do mundo e apontada para diferentes localizações
 // atributos: posicaoDaCamera, mira, vUp, vOrtonomais (u, v, w), distanciaParaTela, larguraDaTela, alturadaTela
 // mira -> Ponto para onde a câmera está apontada
