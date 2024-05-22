@@ -12,8 +12,7 @@ using namespace std;
 
 const double infinity = std::numeric_limits<double>::infinity();
 
-
-
+// calcula a interseção de um raio com uma esfera
 double hit(const vetor<double>& center, double radius, const raio<double>& raio) {
     double a = produtoEscalar(raio.direcao, raio.direcao);
     vetor<double> oc = subtracao(center, raio.origem);
@@ -29,14 +28,15 @@ double hit(const vetor<double>& center, double radius, const raio<double>& raio)
     }
 }
 
+// define a cor do fundo
 vetor<double> backgroundColor(const vetor<double>& dir) {
     double t = 0.5 * (dir.y + 1.0);
     return vetor<double>((1 - t) * 1.0 + t * 0.5,
                          (1 - t) * 1.0 + t * 0.7,
                          (1 - t) * 1.0 + t * 1.0);
 }
+
 // define se um raio intersecta ou não um plano -> retorna true se intersecta, false caso contrário
-//  ax + by + cz + d = 0 -> equação do plano
 bool hitPlano(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raioDeInterseccao) {
     double denominador = produtoEscalar(normal, raioDeInterseccao.direcao); // usado pra determinar se o raio é paralelo ao plano
     // Verifica se o denominador é zero para evitar divisão por zero
@@ -48,7 +48,7 @@ bool hitPlano(const vetor<double>& pontoNoPlano, const vetor<double>& normal, co
     return t >= 0; // Se t for maior ou igual a zero, o raio intersecta o plano
 } //**************
 
-// Function to compute color of the raio
+// define a cor do pixel de acordo com a interseção do raio com a esfera
 vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
     hit_record rec;
     if(mundo.hit(raio, 0, infinity, rec)){
