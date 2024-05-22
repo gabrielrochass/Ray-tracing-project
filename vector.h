@@ -60,7 +60,7 @@ vetor<T> multiplicacaoPorEscalar(const vetor<T>& v, T escalar) {
 }
 
 template<typename T>
-struct raio {
+struct raio { 
     vetor<T> origem;
     vetor<T> direcao;
 
@@ -76,12 +76,12 @@ vetor<T> mult(T scalar, vetor<T> h) {
 }
 
 template<typename T> 
-vetor<T> subtracaoVP(T scalar, vetor<T> h) {
+vetor<T> subtracaoVP(T scalar, vetor<T> h) { // subtrai vetor por escalar
     return vetor<T>(h.x - scalar, h.y - scalar, h.z - scalar);
 }
 
 template<typename T>
-vetor<T> raioAt(raio<T> r, T t) {
+vetor<T> raioAt(raio<T> r, T t) { // calcula o ponto no espaço que o raio atinge 
     
     return soma(r.origem, mult(t, r.direcao));
 }
