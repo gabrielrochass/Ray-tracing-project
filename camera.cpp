@@ -1,42 +1,54 @@
 #include <iostream>
 #include <cmath>
-#include "ponto.h"
+#include "Ponto.h"
 #include "vector.h"
 
 using namespace std;
-#ifndef CAMERA_H
-#define CAMERA_H
 
-template<typename T>
-// Define a classe Camera
-class Camera {
-public:
-    vetor<T> horizontal, vertical, lowerleftcorner, origem;
-    /*const int imWidth = 800;
-    const int imHeight = static_cast<int>(imWidth / (16.0 / 9.0));*/
-public:
-    Camera(double vfov) {
-        double theta = vfov * M_PI / 180.0;
-        double h = tan(theta / 2.0);
-        double aspectratio = 16.0 / 9.0;
-        vetor origem{0.0, 0.0, 0.0};
-        double viewportHeight = 2.0;
-        double viewportWidth = viewportHeight * 16.0 / 9.0;
-        vetor horizontal{viewportWidth, 0.0, 0.0};
-        vetor vertical{0.0, viewportHeight, 0.0};
-        vetor h2 = mult(0.5, horizontal);
-        vetor h2o = subtracao(origem, h2);
-        vetor v2 = mult(0.5, vertical);
-        vetor lente{0.0, 0.0, 1.0};
-        vetor v2f = subtracao(v2, lente);
-        vetor lowerLeftCorner = subtracao(h2o, v2f);
-        // # lowerleftcorner = origin - horizontal/2 - vertical/2 - Vec3(0.0, 0.0, focallenght)
-            
+// Classe Camera
+// câmera móvel -> pode ser posicionada em qualquer lugar do mundo e apontada para diferentes localizações
+// atributos: posicaoDaCamera, mira, vUp, vOrtonomais (u, v, w), distanciaParaTela, larguraDaTela, alturadaTela
+// posicao -> Ponto onde a câmera está
+// mira -> Ponto para onde a câmera está apontada
+// vUp -> vetor que indica a direção para cima da câmera 
+// vOrtonomais -> 3 vetores ortogonais entre si que definem a base da câmera
+// w -> direção oposta ao veor que vai de posicao para mira
+// u -> vetor perpendicular a w e vUp
+// v -> vetor perpendicular a u e w -> define o vetor para cima da câmera
+// distanciaParaTela -> distância da câmera para a tela
+// largura -> largura da tela
+// altura -> altura da tela
+
+
+// etapas:
+// 1. inicializar os parâmetros da câmera
+// 2. calcular os vetores u, v, w
+// 3. calcular a base da câmera
+// 4. gerar os raios primários
+
+
+struct Camera {
+    // define atributos
+    vetor<double> posicaoDaCamera;
+    vetor<double> mira;
+    vetor<double> vUp;
+    vetor<double> w, u, v;
+    
+    // construtor
+    Camera(const vetor<double>& posicaoDaCamera_, const vetor<double>& mira_, const vetor<double>& vUp_, double distanciaParaTela_, double larguraDaTela_, double alturadaTela_) : 
+    posicaoDaCamera(posicaoDaCamera_), mira(mira_), vUp(vUp_) {
+        w = vetorUni(subtracao(mira, posicaoDaCamera));
+        u = vetorUni(produtoVetorial(vUp, w));
+        v = produtoVetorial(w, u);
     }
-    
-        
-        
-    
+
 };
 
-#endif // CAMERA_H
+// testando a classe Camera
+int main() {
+    Camera cam(vetor<double>(0, 0, 0), vetor<double>(0, 0, -1), vetor<double>(0, 1, 0), 1, 2, 2);
+    cout << "u: " << cam.u << endl;
+    cout << "v: " << cam.v << endl;
+    cout << "w: " << cam.w << endl;
+    return 0;
+}
