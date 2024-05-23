@@ -76,7 +76,7 @@ int main() {
 
     // define a câmera
     vetor<double> posicaoDaCamera(0, 0, 0);
-    vetor<double> mira(0, 0, -1);
+    vetor<double> mira(0, 0, 1);
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
 
