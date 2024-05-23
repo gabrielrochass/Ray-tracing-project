@@ -55,17 +55,16 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
         return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
     }
     else if(hitPlano({0.0, -1.25, -1.0}, {0.0, 1.0, 0.0}, raio)) {
-        return vetor<double>(0.0, 1.0, 0.0);
+        return vetor<double>(1.0, 1.0, 1.0);
     }
     vetor<double> direcao_uni = vetorUni(raio.direcao);
-    auto t = 0.5 * (direcao_uni.y + 1.0);
-    return soma(multiplicacaoPorEscalar(vetor<double>(1.0, 1.0, 1.0), 1.0 - t), multiplicacaoPorEscalar(vetor<double>(0.5, 0.7, 1.0), t));
+    return backgroundColor(direcao_uni);
 }
 
 
 int main() {
     // define a imagem
-    const int imWidth = 801;
+    const int imWidth = 800;
     const int imHeight = static_cast<int>(imWidth / (16.0 / 9.0));
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
@@ -82,9 +81,13 @@ int main() {
     Camera camera(posicaoDaCamera, mira, vUp);
 
     // define a viewport
-    const vetor<double> larguraDaViewport(16.0, 0.0, 0.0);
-    const vetor<double> alturaDaViewport(0.0, 9.0, 0.0);
-
+    const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
+    const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
+    vetor<double> horizontal{larguraDaViewport.x, 0.0, 0.0};
+    vetor<double> vertical{0.0, alturaDaViewport.y, 0.0};
+    //vetor<double> cantoEsquerdoTela = subtracao(vetor{-16.0 / 9.0, 0.0, 0.0}, vetor{0.0, -1.0, 1.0});
+    vetor<double> cantoEsquerdoTela = subtracao(subtracao(subtracao(camera.posicaoDaCamera, mult(0.5, horizontal)), mult(0.5, vertical)), mira);
+    //vetor cantoEsquerdoTela = origem - horizontal/2 - vertical/2 - mira
     // define a esfera
     vetor<double> sphereCenter{0.0, 0.0, -1.0};
     double sphereRadius = 0.5;
@@ -95,7 +98,7 @@ int main() {
             double u = double(i) / (imWidth - 1);
             double v = 1.0 - double(j) / (imHeight - 1);
             
-            vetor<double> direcaoDoRaio = soma(camera.posicaoDaCamera, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport)));
+            vetor<double> direcaoDoRaio = soma(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, horizontal), mult(v, vertical))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             vetor<double> color = raioColor(r, mundo);
             image[j][i] = color;
