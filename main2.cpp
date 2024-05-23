@@ -83,11 +83,10 @@ int main() {
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
-    vetor<double> horizontal{larguraDaViewport.x, 0.0, 0.0};
-    vetor<double> vertical{0.0, alturaDaViewport.y, 0.0};
-    //vetor<double> cantoEsquerdoTela = subtracao(vetor{-16.0 / 9.0, 0.0, 0.0}, vetor{0.0, -1.0, 1.0});
-    vetor<double> cantoEsquerdoTela = subtracao(subtracao(subtracao(camera.posicaoDaCamera, mult(0.5, horizontal)), mult(0.5, vertical)), mira);
-    //vetor cantoEsquerdoTela = origem - horizontal/2 - vertical/2 - mira
+
+    // define o canto esquerdo da tela -> ponto de origem do raio
+    vetor<double> cantoEsquerdoTela = subtracao(subtracao(subtracao(camera.posicaoDaCamera, mult(0.5, larguraDaViewport)), mult(0.5, alturaDaViewport)), mira);
+    
     // define a esfera
     vetor<double> sphereCenter{0.0, 0.0, -1.0};
     double sphereRadius = 0.5;
@@ -98,7 +97,7 @@ int main() {
             double u = double(i) / (imWidth - 1);
             double v = 1.0 - double(j) / (imHeight - 1);
             
-            vetor<double> direcaoDoRaio = soma(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, horizontal), mult(v, vertical))));
+            vetor<double> direcaoDoRaio = soma(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             vetor<double> color = raioColor(r, mundo);
             image[j][i] = color;

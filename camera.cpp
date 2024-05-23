@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "Ponto.h"
+#include "ponto.h"
 #include "vector.h"
 
 using namespace std;
