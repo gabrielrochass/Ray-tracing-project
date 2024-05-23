@@ -6,6 +6,9 @@
 #include "camera.cpp"
 #include "sphere_list.h"
 #include "sphere.h"
+#include "malha_triangulos.h"
+#include "triangulo.h"
+#include "hit_record.h"
 #include <limits>
 
 using namespace std;
@@ -48,20 +51,18 @@ bool hitPlano(const vetor<double>& pontoNoPlano, const vetor<double>& normal, co
     return t >= 0; // Se t for maior ou igual a zero, o raio intersecta o plano
 } //**************
 
-// Function to compute color of the raio
-vetor<double> raioColor(const raio<double>& raio, const sphere_list& mundo) {
+vetor<double> raioColor(const raio<double>& raio, malha mundo) {
     hit_record rec;
-    if(mundo.hit(raio, 0, infinity, rec)){
+    vetor<double> pontoNoPlano(0, 0, 0); // Ajuste conforme necessário
+    vetor<double> normal(0, 1, 0);       // Ajuste conforme necessário
+
+    if(mundo.hit(pontoNoPlano, normal, raio, 0, infinity, rec)){
         return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
-    }
-    else if(hitPlano({0.0, -1.25, -1.0}, {0.0, 1.0, 0.0}, raio)) { 
-        return vetor<double>(0.0, 1.0, 0.0);
     }
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     auto t = 0.5 * (direcao_uni.y + 1.0);
     return soma(multiplicacaoPorEscalar(vetor<double>(1.0, 1.0, 1.0), 1.0 - t), multiplicacaoPorEscalar(vetor<double>(0.5, 0.7, 1.0), t));
 }
-
 
 
 
@@ -72,11 +73,11 @@ int main() {
     
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
-    sphere_list mundo;
-    //mundo.add(sphere(vetor<double>(0, -100.5, -1), 100));
-    mundo.add(sphere(vetor<double>(0, 0, -1), 0.5));  
-    mundo.add(sphere(vetor<double>(1, +100.5, -1), 100)); 
-
+    malha mundo;
+    // Adicione triângulos à malha
+    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
+    mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
+    
     vetor<double> origem{0.0, 0.0, 0.0};
     double viewportHeight = 2.0;
     double viewportWidth = viewportHeight * 16.0 / 9.0;
@@ -88,12 +89,6 @@ int main() {
     vetor<double> lente{0, 0, -1};
     vetor<double> v2f = subtracao(v2, lente);
     vetor<double> lowerLeftCorner = subtracao(h2o, v2f);
-    //vetor lowerLeftCorner = origem - horizontal/2 - vertical/2 - Vec3(0.0, 0.0, focallenght)
-;
-    
-    vetor<double> sphereCenter{0.0, 0.0, -1.0};
-    double sphereRadius = 0.5;
-    
 
     for (int j = 0; j < imHeight; ++j) {
         for (int i = 0; i < imWidth; ++i) {
@@ -105,7 +100,6 @@ int main() {
         }
     }
 
-    
     cout << "P3\n" << imWidth << " " << imHeight << "\n255\n";
     for (int j = 0; j < imHeight; ++j) {
         for (int i = 0; i < imWidth; ++i) {
@@ -115,9 +109,8 @@ int main() {
             cout << ir << " " << ig << " " << ib << "\n";
         }
     }
-    
 
-    
     clog << "\rDone.                 \n";
     return 0;
 }
+

@@ -2,14 +2,10 @@
 #define SPHERE_H
 
 #include "vector.h"
+#include "hit_record.h"
 
 using namespace std;
 
-struct hit_record {
-    vetor<double> p;
-    vetor<double> normal;
-    double t;
-};
 
 class sphere{
     public:
