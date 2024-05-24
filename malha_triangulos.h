@@ -3,8 +3,8 @@
 
 #include "vector.h"
 #include "triangulo.h"
-
-#include <bits/stdc++.h>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 

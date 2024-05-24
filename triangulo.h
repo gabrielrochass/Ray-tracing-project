@@ -4,7 +4,7 @@
 #include "vector.h"
 #include "hit_record.h"
 
-#include <bits/stdc++.h>
+#include <cmath>
 
 using namespace std;
 
