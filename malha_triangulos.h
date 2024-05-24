@@ -32,7 +32,7 @@ class malha{
             lista_normais.push_back(produtoVetorial(t.vetor1,t.vetor2));
         }
 
-        double hit(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raio, double t_min, double t_max, hit_record& rec){
+        bool hit(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raio, double t_min, double t_max, hit_record& rec){
             hit_record temp_rec;
             bool acertou_algo = false;
             auto mais_perto = t_max;

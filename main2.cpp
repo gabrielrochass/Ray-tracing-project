@@ -86,7 +86,7 @@ int main() {
     vetor<double> h2 = mult(0.5, horizontal);
     vetor<double> h2o = subtracao(origem, h2);
     vetor<double> v2 = mult(0.5, vertical);
-    vetor<double> lente{0, 0, -1};
+    vetor<double> lente{1, 0, -1};
     vetor<double> v2f = subtracao(v2, lente);
     vetor<double> lowerLeftCorner = subtracao(h2o, v2f);
 

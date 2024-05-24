@@ -29,15 +29,17 @@ class triangulo{
                     return false;
                 } 
 
+                vetor<double> pontoInterseccao = raioAt(raio, t);
+
                 // Calculando as coordenadas baricêntricas
                 denominador = (vertice2.y - vertice3.y) * (vertice1.x - vertice3.x) + (vertice3.x - vertice2.x) * (vertice1.y - vertice3.y);
 
-                double lambda1 = ((vertice2.y - vertice3.y) * (pontoNoPlano.x - vertice3.x) + (vertice3.x - vertice2.x) * (pontoNoPlano.y - vertice3.y)) / denominador;
-                double lambda2 = ((vertice3.y - vertice1.y) * (pontoNoPlano.x - vertice3.x) + (vertice1.x - vertice3.x) * (pontoNoPlano.y - vertice3.y)) / denominador;
-                double lambda3 = 1.0 - lambda1 - lambda2;
+                double alfa = ((vertice2.y - vertice3.y) * (pontoInterseccao.x - vertice3.x) + (vertice3.x - vertice2.x) * (pontoInterseccao.y - vertice3.y)) / denominador;
+                double beta  = ((vertice3.y - vertice1.y) * (pontoInterseccao.x - vertice3.x) + (vertice1.x - vertice3.x) * (pontoInterseccao.y - vertice3.y)) / denominador;
+                double gama = 1.0 - alfa - beta;
 
                 // Verificando se o ponto de interseção está dentro do triângulo
-                if (lambda1 >= 0 && lambda2 >= 0 && lambda3 >= 0) {
+                if (alfa >= 0 && beta >= 0 && gama >= 0) {
                     // O ponto de interseção está dentro do triângulo
                     return true;
                 }
