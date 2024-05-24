@@ -29,8 +29,8 @@ vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esfer
     if(esferas.hit(raio, 0, infinity, rec)) {
         return vetor<double>(1.0, 0.0, 0.0);
     }
-    else if(mundo.hit(plan.pontoNoPlano, plan.normal, raio, 0, infinity, rec)){
-        return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
+    else if(mundo.hit(raio, 0, infinity, rec)) {
+        return vetor<double>(0.0, 1.0, 0.0);
     }
     else if(plan.hitPlano(plan, raio)) {
         return vetor<double>(1.0, 1.0, 0.0);
@@ -63,6 +63,11 @@ int main() {
 
     // adiciona esferas ao mundo
     esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5));
+    esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
+    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
+
+    // adiciona triângulos à malha
+    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1}));
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);

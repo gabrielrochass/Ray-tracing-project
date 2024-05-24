@@ -32,15 +32,14 @@ class malha{
             lista_normais.push_back(produtoVetorial(t.vetor1,t.vetor2));
         }
 
-        bool hit(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raio, double t_min, double t_max, hit_record& rec){
+        bool hit(const raio<double>& r, double t_min, double t_max, hit_record& rec) const {
             hit_record temp_rec;
             bool acertou_algo = false;
-            auto mais_perto = t_max;
-
-            for (const auto& l : lista_triangulos) {
-                if (l.hit(pontoNoPlano, normal, raio, raio, t_min, t_max, rec)) {
+            double t_mais_proximo = t_max;
+            for (int i = 0; i < num_triangulos; i++){
+                if (lista_triangulos[i].hit(lista_vertices[i], lista_normais[i], r, r, t_min, t_mais_proximo, temp_rec)){
                     acertou_algo = true;
-                    mais_perto = temp_rec.t;
+                    t_mais_proximo = temp_rec.t;
                     rec = temp_rec;
                 }
             }
