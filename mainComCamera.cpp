@@ -10,7 +10,8 @@
 #include <limits>
 #include "objeto.h"
 #include <memory>
-
+#include "malha_triangulos.h"
+#include "triangulo.h"
 using namespace std;
 
 const double infinity = std::numeric_limits<double>::infinity();
@@ -23,10 +24,10 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-vetor<double> raioColor(const raio<double>& raio, const lista_objetos& mundo) {
+vetor<double> raioColor(const raio<double>& raio, const malha mundo) {
     hit_record rec;
     plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 0.0});
-    if(mundo.hitEsferaa(raio, 0, infinity, rec)){
+    if(mundo.hit(raio, 0, infinity, rec)){
         return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
     }
    
@@ -45,10 +46,10 @@ int main() {
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
     // define o mundo
-    sphere_list mundo;
-    //mundo.add(sphere(vetor<double>(0, -100.5, -1), 100));
-    mundo.add(sphere(vetor<double>(0, 0, -1), 0.5));
-    mundo.add(sphere(vetor<double>(1, +100.5, -1), 100));
+    malha mundo;
+    // Adicione triângulos à malha
+    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
+    mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
 
   
     // define a câmera
