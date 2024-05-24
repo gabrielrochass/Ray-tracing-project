@@ -12,6 +12,9 @@ struct vetor {
     T x, y, z;
     vetor(T xRecebido, T yRecebido, T zRecebido) : x(xRecebido), y(yRecebido), z(zRecebido) {} // Construtor do vetor
     vetor() : x(0), y(0), z(0) {} // Construtor padrão (inicializa com zero)
+    bool operator==(const vetor& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    } //Resolvendo erro de compilação.
 };
 
 // Função soma
