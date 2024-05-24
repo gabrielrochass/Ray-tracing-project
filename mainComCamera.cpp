@@ -24,10 +24,10 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-vetor<double> raioColor(const raio<double>& raio, const malha mundo) {
+vetor<double> raioColor(const raio<double>& raio, malha mundo) {
     hit_record rec;
     plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 0.0});
-    if(mundo.hit(raio, 0, infinity, rec)){
+    if(mundo.hit(plan.pontoNoPlano, plan.normal, raio, 0, infinity, rec)){
         return multiplicacaoPorEscalar(vetor<double>(rec.normal.x + 1, rec.normal.y + 1, rec.normal.z + 1),0.5);
     }
    
@@ -74,7 +74,7 @@ int main() {
             
             vetor<double> direcaoDoRaio = soma(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            vetor<double> color = raioColor(r, scene);
+            vetor<double> color = raioColor(r, mundo);
             image[j][i] = color;
         }
     }
