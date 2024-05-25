@@ -12,6 +12,9 @@ struct vetor {
     T x, y, z;
     vetor(T xRecebido, T yRecebido, T zRecebido) : x(xRecebido), y(yRecebido), z(zRecebido) {} // Construtor do vetor
     vetor() : x(0), y(0), z(0) {} // Construtor padrão (inicializa com zero)
+    bool operator==(const vetor& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    } //Resolvendo erro de compilação.
 };
 
 // Função soma
@@ -60,6 +63,11 @@ vetor<T> multiplicacaoPorEscalar(const vetor<T>& v, T escalar) {
 }
 
 template<typename T>
+bool operator==(const vetor<T>& v1, const vetor<T>& v2) {
+    return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
+}
+
+template<typename T>
 struct raio { 
     vetor<T> origem;
     vetor<T> direcao;
@@ -85,6 +93,8 @@ vetor<T> raioAt(raio<T> r, T t) { // calcula o ponto no espaço que o raio ating
     
     return soma(r.origem, mult(t, r.direcao));
 }
+
+
 
 #endif // VECTOR_H
 

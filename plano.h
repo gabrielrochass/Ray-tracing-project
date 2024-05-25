@@ -1,3 +1,6 @@
+#ifndef PLANO_H
+#define PLANO_H
+
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -8,13 +11,18 @@
 #include <limits>
 
 
-struct plano {
-    vetor<double> pontoNoPlano;
-    vetor<double> normal;
+using namespace std;
 
-    plano() {}
-    plano(vetor<double> ponto, vetor<double> normal) : pontoNoPlano(ponto), normal(normal) {}
-    bool hitPlano(const plano& plano, const raio<double>& raioDeInterseccao);
+
+class plano {
+    public:
+        vetor<double> pontoNoPlano;
+        vetor<double> normal;
+
+        plano() {}
+        plano(vetor<double> ponto, vetor<double> normal) : pontoNoPlano(ponto), normal(normal) {}
+        bool hitPlano(const plano& plano, const raio<double>& raioDeInterseccao);
+
 };
 
 // define se um raio intersecta ou não um plano -> retorna true se intersecta, false caso contrário
@@ -28,3 +36,5 @@ bool plano::hitPlano(const plano& plano, const raio<double>& raioDeInterseccao) 
     double t = -produtoEscalar(subtracao(raioDeInterseccao.origem, plano.pontoNoPlano), plano.normal) / denominador;
     return t >= 0; // Se t for maior ou igual a zero, o raio intersecta o plano
 } //**************
+
+#endif
