@@ -29,9 +29,9 @@ class triangulo{
                     return false;
                 } 
 
-                vetor<double> pontoInterseccao = raioAt(raio, t);
+                vetor<double> pontoInterseccao = raioAt(raio, t); // ponto no espaço que o raio atinge
 
-                // Calculando as coordenadas baricêntricas
+                // Calculando as coordenadas baricêntricas a partir do raio de interseção pra saber se o ponto de interseção está dentro do triângulo
                 denominador = (vertice2.y - vertice3.y) * (vertice1.x - vertice3.x) + (vertice3.x - vertice2.x) * (vertice1.y - vertice3.y);
 
                 double alfa = ((vertice2.y - vertice3.y) * (pontoInterseccao.x - vertice3.x) + (vertice3.x - vertice2.x) * (pontoInterseccao.y - vertice3.y)) / denominador;
@@ -41,9 +41,9 @@ class triangulo{
                 // Verificando se o ponto de interseção está dentro do triângulo
                 if (alfa >= 0 && beta >= 0 && gama >= 0) {
                     // O ponto de interseção está dentro do triângulo
-                    return true;
+                    return true; 
                 }
-                return false;
+                return false; // O ponto de interseção tá fora do triângulo
             }
         
     public:
