@@ -34,7 +34,7 @@ vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esfer
         return vetor<double>(0.0, 1.0, 0.0);
     }
     else if(plan.hitPlano(plan, raio)) {
-        return vetor<double>(1.0, 1.0, 0.0);
+        return vetor<double>(0.2, 0.5, 0.9);
     } 
 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
@@ -67,27 +67,30 @@ int main() {
     // esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
     // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
     esferas.add(sphere(vetor<double>{0, 0, 2}, 0.5));
+    
     // adiciona triângulos à malha
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{0.8, -0.8, -1.1}, vetor<double>{0.8, -0.8, -1.1}, vetor<double>{0.8, -0.8, -1.1}));
-
-    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1}));
-    mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
-
-    // // define o espaço entre os triângulos
-    // double espaco = 0.1;
+    // malha de cima
+    mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, -1, -1}, vetor<double>{2, 0, -1}));
+    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
+    mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
 
 
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
+    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
+
     // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));
+
+    // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
+    // cada vetor<double> é um ponto no espaço 3D
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
     vetor<double> cantoEsquerdoTela = subtracao(subtracao(subtracao(camera.posicaoDaCamera, mult(0.5, larguraDaViewport)), mult(0.5, alturaDaViewport)), mira);
     //vetor cantoEsquerdoTela = origem - horizontal/2 - vertical/2 - mira
-    
-    
     
     // define a cor do fundo
     for (int j = 0; j < imHeight; ++j) {

@@ -47,9 +47,9 @@ class malha{
             return acertou_algo;
         }
     public:
-        vector<vetor<double>> lista_vertices;
+        vector<vetor<double>> lista_vertices; 
         vector<triangulo> lista_triangulos;
-        vector<vetor<double>> lista_normais;
+        vector<vetor<double>> lista_normais; 
         vector<vetor<double>> lista_normais_vertices;
         int num_triangulos;
         int num_vertices;
