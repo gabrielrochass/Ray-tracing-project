@@ -69,9 +69,22 @@ int main() {
     esferas.add(sphere(vetor<double>{0, 0, 2}, 0.5));
     
     // adiciona triângulos à malha
-    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1}));
-    mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{-0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
+    // malha de cima
+    mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, -1, -1}, vetor<double>{2, 0, -1}));
+    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
+    mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
+
+
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
+    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
+
+    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));
+
+    // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
+    // cada vetor<double> é um ponto no espaço 3D
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
