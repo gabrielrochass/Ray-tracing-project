@@ -6,7 +6,7 @@
 #include "camera.h"
 #include "sphere_list.h"
 #include "sphere.h"
-#include "plano.h" // Add this line to include the "plano" class
+#include "plano.h" 
 #include <limits>
 #include <memory>
 #include "malha_triangulos.h"
@@ -25,7 +25,7 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
 
 vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esferas) {
     hit_record rec;
-    // plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 0.0});
+    
     plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 2});
     if(esferas.hit(raio, 0, infinity, rec)) {
         return vetor<double>(1.0, 0.0, 0.0);
@@ -58,14 +58,7 @@ int main() {
     // define o mundo
     malha mundo;
     sphere_list esferas;
-    // Adicione triângulos à malha
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
-    // mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
-
-    // adiciona esferas ao mundo
-    // esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
+    
     esferas.add(sphere(vetor<double>{0, 0, 2}, 0.5));
     
     // adiciona triângulos à malha
@@ -74,14 +67,6 @@ int main() {
     mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
     mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
-
-
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
-
-    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));
 
     // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
     // cada vetor<double> é um ponto no espaço 3D
@@ -116,9 +101,27 @@ int main() {
         }
     }
 
+    
 
 
     clog << "\rDone.                 \n";
     
     return 0;
 }
+
+// Adicione triângulos à malha
+    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
+    // mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
+
+    // adiciona esferas ao mundo
+    // esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5));
+    // esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
+    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
+
+
+ // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
+    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
+
+    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));
