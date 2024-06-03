@@ -8,6 +8,7 @@
 #include "vector.h"
 #include "sphere_list.h"
 #include "sphere.h"
+#include "raio.h"
 #include <limits>
 
 

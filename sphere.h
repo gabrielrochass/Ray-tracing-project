@@ -3,7 +3,7 @@
 
 #include "vector.h"
 #include "hit_record.h"
-
+#include "raio.h"
 using namespace std;
 
 

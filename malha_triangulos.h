@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include "triangulo.h"
+#include "raio.h"
 #include <vector>
 #include <algorithm>
 

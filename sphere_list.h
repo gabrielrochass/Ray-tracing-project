@@ -3,7 +3,7 @@
 
 #include "sphere.h"
 #include "vector.h"
-
+#include "raio.h"
 #include <vector>
 
 using namespace std;
