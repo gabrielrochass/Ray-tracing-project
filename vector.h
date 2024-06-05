@@ -80,16 +80,6 @@ vetor<T> subtracaoVP(T scalar, vetor<T> h) { // subtrai vetor por escalar
 }
 
 
-/*template<typename T>
-struct raio { 
-    vetor<T> origem;
-    vetor<T> direcao;
-
-    raio(vetor<T> comeco, vetor<T> direc) {
-        this->origem = comeco;
-        this->direcao = vetorUni(direc);
-    }
-};
 
 template<typename T>
 vetor<T> raioAt(raio<T> r, T t) { // calcula o ponto no espaço que o raio atinge 
@@ -99,28 +89,5 @@ vetor<T> raioAt(raio<T> r, T t) { // calcula o ponto no espaço que o raio ating
 
 
 
-#endif // VECTOR_H
+#endif 
 
-/*int main2() {
-    // Testando operações com vetores
-    vetor <double> v1{1.0, 0.0, 0.0};
-    vetor <double> v2{0.0, 1.0, 0.0};
-
-    double normV1 = norma(v1);
-    double normV2 = norma(v2);
-
-    double dotProduct = produtoEscalar(v1, v2);
-
-    vetor <double> unitV1 = vetorUni(v1);
-
-
-   cout << "Norma de v1: " << normV1 <<endl;
-   cout << "Norma de v2: " << normV2 <<endl;
-   cout << "Produto escalar de v1 e v2: " << dotProduct <<endl;
-   cout << "Vetor unitário de v1: (" << unitV1.x << ", " << unitV1.y << ", " << unitV1.z << ")" <<endl;
-
-    
-
-
-    return 0;
-}*/
