@@ -79,13 +79,14 @@ vetor<T> subtracaoVP(T scalar, vetor<T> h) { // subtrai vetor por escalar
     return vetor<T>(h.x - scalar, h.y - scalar, h.z - scalar);
 }
 
+std::ostream& operator<<(std::ostream& os, const vetor<double>& v) {
+        os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+        return os;
+    }
 
 
-template<typename T>
-vetor<T> raioAt(raio<T> r, T t) { // calcula o ponto no espaço que o raio atinge 
-    
-    return soma(r.origem, mult(t, r.direcao));
-}*/
+
+
 
 
 
