@@ -38,7 +38,7 @@ public:
     }
 
     // Multiplicação de matriz por vetor
-    vetor<double> operator * (const vetor<double>& v) const {
+    vetor<double> multMatrizVetor (const vetor<double>& v) const  {
         double x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3];
         double y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3];
         double z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3];
@@ -47,17 +47,17 @@ public:
     }
 
     // Multiplicação de matriz por outra matriz
-    matriz4x4 operator * (const matriz4x4& other) const {
-        matriz4x4 result;
+    matriz4x4 operator *(const matriz4x4& outra) const {
+        matriz4x4 resultado;
         for (int i = 0; i < 4; ++i) {
             for (int j = 0; j < 4; ++j) {
-                result[i][j] = 0;
+                resultado[i][j] = 0;
                 for (int k = 0; k < 4; ++k) {
-                    result[i][j] += m[i][k] * other[k][j];
+                    resultado[i][j] += m[i][k] * outra[k][j];
                 }
             }
         }
-        return result;
+        return resultado;
     }
 
     // Função para criar uma matriz de translação
@@ -125,7 +125,7 @@ int main() {
     cout << "Rotation Matrix (45 degrees around Z):\n" << rotation << endl;
 
     // Multiplicação de matriz por vetor
-    vetor<double> transformedVector = translation * v;
+    vetor<double> transformedVector = translation.multMatrizVetor(v);
     cout << "Transformed Vector by Translation: " << transformedVector << endl;
 
     // Multiplicação de duas matrizes
@@ -133,7 +133,7 @@ int main() {
     cout << "Combined Translation and Rotation Matrix:\n" << combined << endl;
 
     // Multiplicação da matriz combinada por vetor
-    vetor<double> finalVector = combined * v;
+    vetor<double> finalVector =  combined.multMatrizVetor(finalVector)
     cout << "Final Transformed Vector: " << finalVector << endl;
 
     return 0;
