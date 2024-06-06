@@ -72,6 +72,7 @@ int main() {
     vetor<double> v3 = rotacao.multMatrizVetor(vetor<double>{2, 0, -1});
     triangulo tri1(v1, v2, v3);
     mundo.add(tri1);
+    mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, -1, -1}, vetor<double>{2, 0, -1}));
     mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
     mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
