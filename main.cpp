@@ -59,7 +59,7 @@ int main() {
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
 
-    double angulo = M_PI / 3.3; // 45 graus
+    double angulo = M_PI / 10; 
     matriz4x4 rotacao = matriz4x4::createRotationZ(angulo);
     // define o mundo
     malha mundo;
@@ -70,8 +70,8 @@ int main() {
     // adiciona triângulos à malha
     // malha de cima
     vetor<double> v1 = rotacao.multMatrizVetor({1, 0, -1});
-    vetor<double> v2 = rotacao.multMatrizVetor({1, -1, -1});
-    vetor<double> v3 = rotacao.multMatrizVetor({2, 0, -1});
+    vetor<double> v2{1, -1, -1};
+    vetor<double> v3{2, 0, -1};
     triangulo tri1(v1, v2, v3);
 
     
