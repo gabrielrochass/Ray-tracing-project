@@ -13,6 +13,7 @@
 #include "triangulo.h"
 #include "raio.h"
 #include "matriz4x4.h"
+
 using namespace std;
 
 const double infinity = std::numeric_limits<double>::infinity();
@@ -44,6 +45,7 @@ vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esfer
 }
 
 
+
 int main() {
     // define a imagem
     const int imWidth = 800;
@@ -57,6 +59,8 @@ int main() {
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
 
+    double angulo = M_PI / 3.3; // 45 graus
+    matriz4x4 rotacao = matriz4x4::createRotationZ(angulo);
     // define o mundo
     malha mundo;
     sphere_list esferas;
@@ -65,18 +69,17 @@ int main() {
     
     // adiciona triângulos à malha
     // malha de cima
-    double angulo60 = M_PI / 3; 
-    matriz4x4 rotacao = matriz4x4::createRotationZ(angulo60);
-    vetor<double> v1 = rotacao.multMatrizVetor(vetor<double>{1, 0, -1});
-    vetor<double> v2 = rotacao.multMatrizVetor(vetor<double>{1, -1, -1});
-    vetor<double> v3 = rotacao.multMatrizVetor(vetor<double>{2, 0, -1});
+    vetor<double> v1 = rotacao.multMatrizVetor({1, 0, -1});
+    vetor<double> v2 = rotacao.multMatrizVetor({1, -1, -1});
+    vetor<double> v3 = rotacao.multMatrizVetor({2, 0, -1});
     triangulo tri1(v1, v2, v3);
+
+    
     mundo.add(tri1);
-    mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, -1, -1}, vetor<double>{2, 0, -1}));
     mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
     mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
-
+    
     // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
     // cada vetor<double> é um ponto no espaço 3D
 
