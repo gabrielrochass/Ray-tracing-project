@@ -70,13 +70,30 @@ int main() {
     // adiciona triângulos à malha
     // malha de cima
     vetor<double> v1 = rotacao.multMatrizVetor({1, 0, -1});
-    vetor<double> v2{1, -1, -1};
-    vetor<double> v3{2, 0, -1};
+    vetor<double> v2 = rotacao.multMatrizVetor({1, -1, -1});
+    vetor<double> v3 = rotacao.multMatrizVetor({2, 0, -1});
     triangulo tri1(v1, v2, v3);
 
+    matriz4x4 rotacaoX = matriz4x4::createRotationX(angulo);
+    vetor<double> v7 = rotacaoX.multMatrizVetor({-1, 0, -1});
+    vetor<double> v8 = rotacaoX.multMatrizVetor({-1, -1, -1});
+    vetor<double> v9 = rotacaoX.multMatrizVetor({0, 0, -1});
+
+    //translação para a direita
     
+    matriz4x4 trans = matriz4x4::createTranslation(0.5, 0, 0);
+    vetor<double> v4 = trans.multMatrizVetor({0, 0 , -1});
+
+
+
+    triangulo tri2(v4, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1});
+    triangulo tri3(v7, v8, v9);
+
     mundo.add(tri1);
-    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
+    mundo.add(tri2);
+    //mundo.add(tri3);
+
+    //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
     mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
     
