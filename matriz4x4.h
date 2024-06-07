@@ -87,6 +87,36 @@ public:
         result[0][1] = -sinA;
         result[1][0] = sinA;
         result[1][1] = cosA;
+        result[2][2] = 1; 
+        result[3][3] = 1;
+        return result;
+    }
+
+     // Função para criar uma matriz de rotação em torno do eixo Z
+    static matriz4x4 createRotationX(double angle) {
+        matriz4x4 result;
+        double cosA = std::cos(angle);
+        double sinA = std::sin(angle);
+        result[0][0] = 1;
+        result[1][1] = cosA;
+        result[1][2] = -sinA;
+        result[2][1] = sinA;
+        result[2][2] = cosA;
+        result[3][3] = 1;
+        return result;
+    }
+
+     // Função para criar uma matriz de rotação em torno do eixo Z
+    static matriz4x4 createRotationY(double angle) {
+        matriz4x4 result;
+        double cosA = std::cos(angle);
+        double sinA = std::sin(angle);
+        result[0][0] = cosA;
+        result[0][2] = -sinA;
+        result[1][1] = 1;
+        result[2][0] = sinA;
+        result[2][2] = cosA;
+        result[3][3] = 1;
         return result;
     }
 
