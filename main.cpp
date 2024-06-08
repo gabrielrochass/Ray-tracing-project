@@ -73,53 +73,35 @@ int main() {
     // define a rotação eixo Y
     matriz4x4 rotacaoY = matriz4x4::createRotationY(angulo);
 
-    // define uma escala 
-    matriz4x4 escala = matriz4x4::createScale(0.5, 0.5, 0.5);
-
     // define o mundo
     malha mundo;
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0, 0, 2}, 0.5));
     
-    // criação dos vértices triângulo 1
-    vetor<double> v1{1, 0, -1};
-    vetor<double> v2{1, -1, -1};
-    vetor<double> v3{2, 0, -1};
-    //aplicando rotações nos eixos X, Y ou Z / translações / escalas.
-    v1 = rotacaoZ.multMatrizVetor(v1);
-    v2 = rotacaoZ.multMatrizVetor(v2);
-    v3 = rotacaoZ.multMatrizVetor(v3);
+    // adiciona triângulos à malha
+    // criação dos vértices triângulo 1 rotacionado eixo Z
+    vetor<double> v1 = rotacaoZ.multMatrizVetor({1, 0, -1});
+    vetor<double> v2 = rotacaoZ.multMatrizVetor({1, -1, -1});
+    vetor<double> v3 = rotacaoZ.multMatrizVetor({2, 0, -1});
     triangulo tri1(v1, v2, v3);
 
-    // criação dos vértices triângulo 2
-    vetor<double> v4{0, 0 , -1};
-    vetor<double> v5{0, -1, -1};
-    vetor<double> v6{1, 0, -1};
-    //aplicando rotações nos eixos X, Y ou Z / translações / escalas.
-    v4 = trans.multMatrizVetor(v4);
-    v5 = trans.multMatrizVetor(v5);
-    v6 = trans.multMatrizVetor(v6);
+    // criação dos vértices triângulo 2 transladado para a direita
+    vetor<double> v4 = trans.multMatrizVetor({0, 0 , -1});
+    vetor<double> v5 = trans.multMatrizVetor({0, -1, -1});
+    vetor<double> v6 = trans.multMatrizVetor({1, 0, -1});
     triangulo tri2(v4, v5, v6);
 
-    // criação dos vértices triângulo 3
-    vetor<double> v7{-1, 0, -1};
-    vetor<double> v8{-1, -1, -1};
-    vetor<double> v9{0, 0, -1};
-    //aplicando rotações nos eixos X, Y ou Z / translações / escalas.
-    v7 = rotacaoX.multMatrizVetor(v7);
-    v8 = rotacaoX.multMatrizVetor(v8);
-    v9 = rotacaoX.multMatrizVetor(v9);
+    // criação dos vértices triângulo 3 rotacionado eixo X
+    vetor<double> v7 = rotacaoX.multMatrizVetor({-1, 0, -1});
+    vetor<double> v8 = rotacaoX.multMatrizVetor({-1, -1, -1});
+    vetor<double> v9 = rotacaoX.multMatrizVetor({0, 0, -1});
     triangulo tri3(v7, v8, v9);
 
-    // criação dos vértices triângulo 4
-    vetor<double> v10{-2, 0, -1};
-    vetor<double> v11{-2, -1, -1};
-    vetor<double> v12{-1, 0, -1};
-    //aplicando rotações nos eixos X, Y ou Z / translações / escalas.
-    v10 = rotacaoY.multMatrizVetor(v10);
-    v11 = rotacaoY.multMatrizVetor(v11);    
-    v12 = rotacaoY.multMatrizVetor(v12);    
+    // criação dos vértices triângulo 4 rotacionado eixo Y
+    vetor<double> v10 = rotacaoY.multMatrizVetor({-2, 0, -1});
+    vetor<double> v11 = rotacaoY.multMatrizVetor({-2, -1, -1});
+    vetor<double> v12 = rotacaoY.multMatrizVetor({-1, 0, -1});
     triangulo tri4(v10, v11, v12);
 
     mundo.add(tri1);
