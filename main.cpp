@@ -37,7 +37,8 @@ vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esfer
         return vetor<double>(0.0, 1.0, 0.0);
     }
     else if(plan.hitPlano(plan, raio)) {
-        return vetor<double>(0.2, 0.5, 0.9);
+        vetor<double> direcao_uni = vetorUni(raio.direcao);
+        return backgroundColor(direcao_uni);
     } 
 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
