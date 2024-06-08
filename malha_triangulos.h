@@ -41,7 +41,15 @@ class malha{
                 if (lista_triangulos[i].hit(lista_vertices[i], lista_normais[i], r, r, t_min, t_mais_proximo, temp_rec)){
                     acertou_algo = true;
                     t_mais_proximo = temp_rec.t;
+                    //rec = temp_rec;
+
+                    // Preenche o índice do triângulo atingido no objeto hit_record
+                    rec.indice_tri = i;
+                    temp_rec.normal = lista_normais[i];
                     rec = temp_rec;
+
+
+                    
                 }
             }
 

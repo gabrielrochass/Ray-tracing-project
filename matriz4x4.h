@@ -76,15 +76,6 @@ public:
         return resultado;
     }
 
-    // Função para criar uma matriz de escala
-    static matriz4x4 createScale(double sx, double sy, double sz) {
-        matriz4x4 resultado;
-        resultado[0][0] = sx;
-        resultado[1][1] = sy;
-        resultado[2][2] = sz;
-        resultado[3][3] = 1;
-        return resultado;
-    }
 
     // Função para criar uma matriz de rotação em torno do eixo Z horario
     static matriz4x4 createRotationZ(double angle) {

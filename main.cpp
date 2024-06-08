@@ -31,15 +31,20 @@ vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esfer
     
     plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 2});
     if(esferas.hit(raio, 0, infinity, rec)) {
-        return vetor<double>(1.0, 0.0, 0.0);
+        vetor<double> p = raioAt(raio, rec.t);
+        vetor<double> N = vetorUni(subtracao(p, vetor<double>(0, -0.5, -1)));
+        vetor<double> color = mult(0.5, soma(esferas.list[0].center, N));
+        return color; 
     }
     else if(mundo.hit(raio, 0, infinity, rec)) {
-        return vetor<double>(0.0, 1.0, 0.0);
+        
+        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
+        return color;
     }
-    else if(plan.hitPlano(plan, raio)) {
+    /*else if(plan.hitPlano(plan, raio)) {
         vetor<double> direcao_uni = vetorUni(raio.direcao);
         return backgroundColor(direcao_uni);
-    } 
+    } */
 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     return backgroundColor(direcao_uni);
@@ -69,16 +74,18 @@ int main() {
     matriz4x4 rotacaoX = matriz4x4::createRotationX(angulo);
 
     //translação para a direita
-    matriz4x4 trans = matriz4x4::createTranslation(0.5, 0, 0);
+    matriz4x4 trans = matriz4x4::createTranslation(-0.5, 0, 0);
 
     // define a rotação eixo Y
     matriz4x4 rotacaoY = matriz4x4::createRotationY(angulo);
+
+    
 
     // define o mundo
     malha mundo;
     sphere_list esferas;
     
-    esferas.add(sphere(vetor<double>{0, 0, 2}, 0.5));
+    esferas.add(sphere(vetor<double>{0, -0.5, -1}, 0.25));
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -105,10 +112,13 @@ int main() {
     vetor<double> v12 = rotacaoY.multMatrizVetor({-1, 0, -1});
     triangulo tri4(v10, v11, v12);
 
+    
+
     mundo.add(tri1);
     mundo.add(tri2);
     mundo.add(tri3);
     mundo.add(tri4);
+  
     //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
     //mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
