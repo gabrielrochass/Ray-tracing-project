@@ -50,16 +50,16 @@ public:
 
     // Função para criar uma matriz de translação
     static matriz4x4 createTranslation(double tx, double ty, double tz) {
-        matriz4x4 result;
-        result[0][3] = tx;
-        result[1][3] = ty;
-        result[2][3] = tz;
-        result[3][3] = 1; 
-        result[2][2] = 1;
-        result[1][1] = 1;
-        result[0][0] = 1;
+        matriz4x4 resultado;
+        resultado[0][3] = tx;
+        resultado[1][3] = ty;
+        resultado[2][3] = tz;
+        resultado[3][3] = 1; 
+        resultado[2][2] = 1;
+        resultado[1][1] = 1;
+        resultado[0][0] = 1;
     
-        return result;
+        return resultado;
     }
 
     // Multiplicação de matriz por outra matriz
@@ -78,53 +78,54 @@ public:
 
     // Função para criar uma matriz de escala
     static matriz4x4 createScale(double sx, double sy, double sz) {
-        matriz4x4 result;
-        result[0][0] = sx;
-        result[1][1] = sy;
-        result[2][2] = sz;
-        return result;
+        matriz4x4 resultado;
+        resultado[0][0] = sx;
+        resultado[1][1] = sy;
+        resultado[2][2] = sz;
+        resultado[3][3] = 1;
+        return resultado;
     }
 
     // Função para criar uma matriz de rotação em torno do eixo Z horario
     static matriz4x4 createRotationZ(double angle) {
-        matriz4x4 result;
+        matriz4x4 resultado;
         double cosA = std::cos(angle);
         double sinA = std::sin(angle);
-        result[0][0] = cosA;
-        result[0][1] = -sinA;
-        result[1][0] = sinA;
-        result[1][1] = cosA;
-        result[2][2] = 1; 
-        result[3][3] = 1;
-        return result;
+        resultado[0][0] = cosA;
+        resultado[0][1] = -sinA;
+        resultado[1][0] = sinA;
+        resultado[1][1] = cosA;
+        resultado[2][2] = 1; 
+        resultado[3][3] = 1;
+        return resultado;
     }
 
      // Função para criar uma matriz de rotação em torno do eixo X
     static matriz4x4 createRotationX(double angle) {
-        matriz4x4 result;
+        matriz4x4 resultado;
         double cosA = std::cos(angle);
         double sinA = std::sin(angle);
-        result[0][0] = 1;
-        result[1][1] = cosA;
-        result[1][2] = -sinA;
-        result[2][1] = sinA;
-        result[2][2] = cosA;
-        result[3][3] = 1;
-        return result;
+        resultado[0][0] = 1;
+        resultado[1][1] = cosA;
+        resultado[1][2] = -sinA;
+        resultado[2][1] = sinA;
+        resultado[2][2] = cosA;
+        resultado[3][3] = 1;
+        return resultado;
     }
 
      // Função para criar uma matriz de rotação em torno do eixo Y
     static matriz4x4 createRotationY(double angle) {
-        matriz4x4 result;
+        matriz4x4 resultado;
         double cosA = std::cos(angle);
         double sinA = std::sin(angle);
-        result[0][0] = cosA;
-        result[0][2] = -sinA;
-        result[1][1] = 1;
-        result[2][0] = sinA;
-        result[2][2] = cosA;
-        result[3][3] = 1;
-        return result;
+        resultado[0][0] = cosA;
+        resultado[0][2] = -sinA;
+        resultado[1][1] = 1;
+        resultado[2][0] = sinA;
+        resultado[2][2] = cosA;
+        resultado[3][3] = 1;
+        return resultado;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const matriz4x4& maz) {
