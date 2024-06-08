@@ -68,16 +68,16 @@ int main() {
     
     double angulo = M_PI / 10; 
     // define a rotação eixo Z
-    matriz4x4 rotacaoZ = matriz4x4::createRotationZ(angulo);
+    matriz4x4 rotacaoZ = matriz4x4::createRotationZ(angulo,false);
 
     // define a rotação eixo X
-    matriz4x4 rotacaoX = matriz4x4::createRotationX(angulo);
+    matriz4x4 rotacaoX = matriz4x4::createRotationX(angulo,false);
 
     //translação para a direita
     matriz4x4 trans = matriz4x4::createTranslation(-0.5, 0, 0);
 
     // define a rotação eixo Y
-    matriz4x4 rotacaoY = matriz4x4::createRotationY(angulo);
+    matriz4x4 rotacaoY = matriz4x4::createRotationY(angulo,false);
 
     
 
