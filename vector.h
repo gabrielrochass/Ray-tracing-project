@@ -67,6 +67,15 @@ bool operator==(const vetor<T>& v1, const vetor<T>& v2) {
     return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
 }
 
+template<typename T>
+vetor<T> operator/(const vetor<T>& v, T scalar) {
+    return vetor<T>(v.x / scalar, v.y / scalar, v.z / scalar);
+}   
+
+template<typename T>
+vetor<T> normal(vetor<T> v) {
+    return v / norma(v);
+}
 
 
 template<typename T> 

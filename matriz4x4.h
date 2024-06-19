@@ -78,44 +78,74 @@ public:
 
 
     // Função para criar uma matriz de rotação em torno do eixo Z horario
-    static matriz4x4 createRotationZ(double angle) {
+    static matriz4x4 createRotationZ(double angle, bool clockwise) {
         matriz4x4 resultado;
         double cosA = std::cos(angle);
         double sinA = std::sin(angle);
-        resultado[0][0] = cosA;
-        resultado[0][1] = -sinA;
-        resultado[1][0] = sinA;
-        resultado[1][1] = cosA;
-        resultado[2][2] = 1; 
-        resultado[3][3] = 1;
+        if (clockwise) {
+            resultado[0][0] = cosA;
+            resultado[0][1] = sinA;
+            resultado[1][0] = -sinA;
+            resultado[1][1] = cosA;
+            resultado[2][2] = 1; 
+            resultado[3][3] = 1;
+        } else {
+            resultado[0][0] = cosA;
+            resultado[0][1] = -sinA;
+            resultado[1][0] = sinA;
+            resultado[1][1] = cosA;
+            resultado[2][2] = 1; 
+            resultado[3][3] = 1;
+        }
+        
         return resultado;
     }
 
      // Função para criar uma matriz de rotação em torno do eixo X
-    static matriz4x4 createRotationX(double angle) {
+    static matriz4x4 createRotationX(double angle, bool clockwise) {
         matriz4x4 resultado;
         double cosA = std::cos(angle);
         double sinA = std::sin(angle);
-        resultado[0][0] = 1;
-        resultado[1][1] = cosA;
-        resultado[1][2] = -sinA;
-        resultado[2][1] = sinA;
-        resultado[2][2] = cosA;
-        resultado[3][3] = 1;
+        if (clockwise){
+            resultado[0][0] = 1;
+            resultado[1][1] = cosA;
+            resultado[1][2] = sinA;
+            resultado[2][1] = -sinA;
+            resultado[2][2] = cosA;
+            resultado[3][3] = 1;
+        } else {
+            resultado[0][0] = 1;
+            resultado[1][1] = cosA;
+            resultado[1][2] = -sinA;
+            resultado[2][1] = sinA;
+            resultado[2][2] = cosA;
+            resultado[3][3] = 1;
+        }
+
         return resultado;
     }
 
      // Função para criar uma matriz de rotação em torno do eixo Y
-    static matriz4x4 createRotationY(double angle) {
+    static matriz4x4 createRotationY(double angle, bool clockwise) {
         matriz4x4 resultado;
         double cosA = std::cos(angle);
         double sinA = std::sin(angle);
-        resultado[0][0] = cosA;
-        resultado[0][2] = -sinA;
-        resultado[1][1] = 1;
-        resultado[2][0] = sinA;
-        resultado[2][2] = cosA;
-        resultado[3][3] = 1;
+        if (clockwise){
+            resultado[0][0] = cosA;
+            resultado[0][2] = -sinA;
+            resultado[1][1] = 1;
+            resultado[2][0] = sinA;
+            resultado[2][2] = cosA;
+            resultado[3][3] = 1;
+        } else {
+            resultado[0][0] = cosA;
+            resultado[0][2] = sinA;
+            resultado[1][1] = 1;
+            resultado[2][0] = -sinA;
+            resultado[2][2] = cosA;
+            resultado[3][3] = 1;
+        }
+
         return resultado;
     }
 
