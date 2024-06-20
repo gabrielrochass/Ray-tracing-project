@@ -1,22 +1,23 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <limits>
+#include <memory>
 #include "ponto.h"
 #include "vector.h"
 #include "camera.h"
 #include "sphere_list.h"
 #include "sphere.h"
 #include "plano.h" 
-#include <limits>
-#include <memory>
 #include "malha_triangulos.h"
 #include "triangulo.h"
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
+
 using namespace std;
 
-const double infinity = std::numeric_limits<double>::infinity();
+const double infinity = numeric_limits<double>::infinity();
 
 // define a cor do fundo
 vetor<double> backgroundColor(const vetor<double>& dir) {
@@ -26,27 +27,7 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-/*vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esferas) {
-    hit_record rec;
-    
-    plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 2});
-    if(esferas.hit(raio, 0, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(subtracao(p, vetor<double>(0.5, 1.0, -1)));
-        vetor<double> color = mult(0.5, soma(esferas.list[0].center, N));
-        return color; 
-    }
-    else if(mundo.hit(raio, 0, infinity, rec)) {
-        
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
-    }
-    
-
-    vetor<double> direcao_uni = vetorUni(raio.direcao);
-    return backgroundColor(direcao_uni);
-}
-*/
+// calcula a cor de um pixel com base na iluminação de Phong
 vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, const iluminacao& luz, const phongComponentes& material) {
     hit_record rec;
 
@@ -77,7 +58,7 @@ int main() {
     Camera camera(posicaoDaCamera, mira, vUp);
 
     
-    double angulo = M_PI / 4; 
+    double angulo = 3.14 / 4; 
     // define a rotação eixo Z
     matriz4x4 rotacaoZ = matriz4x4::createRotationZ(angulo,false);
 
@@ -96,7 +77,8 @@ int main() {
     malha mundo;
     sphere_list esferas;
     
-    esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
+    // esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50)); // especular no centro
+    esferas.add(sphere(vetor<double>{0.0, 0.0, -1.0}, 0.50)); // difusa na esquerda
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -124,11 +106,11 @@ int main() {
     triangulo tri4(v10, v11, v12);
 
     
-
-    mundo.add(tri1);
-    mundo.add(tri2);
-    mundo.add(tri3);
-    mundo.add(tri4);
+    // adiciona os triangulos ao mundo
+    // mundo.add(tri1);
+    // mundo.add(tri2);
+    // mundo.add(tri3);
+    // mundo.add(tri4);
   
     //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
@@ -146,6 +128,7 @@ int main() {
     };
 
     phongComponentes material(0.1, 0.7, 0.5, 10.0);
+    phongComponentes materialDifusa(0.1, 0.9, 0.0, 10.0);
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
@@ -162,7 +145,8 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
+            // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
+            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, materialDifusa);
             image[j][i] = color;
         }
     }
