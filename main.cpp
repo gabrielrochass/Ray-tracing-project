@@ -49,14 +49,21 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
 */
 vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, const iluminacao& luz, const phongComponentes& material) {
     hit_record rec;
-
+    
+    plano plane(vetor<double>{0.0, 0.0, -1.0}, rec.normal);
     if (esferas.hit(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(subtracao(p, vetor<double>(0.0, 0.0, -1)));
-        return calcularIluminacaoPhong(p, N, posicaoObservador, luz, material);
+        vetor<double> N = vetorUni(rec.normal);
+        return calcularIluminacaoPhong(p, N, posicaoObservador, luz, material, esferas);
     }
+    
     else if (mundo.hit(raio, 0, infinity, rec)) {
-        return calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, material);
+        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
+        return color;
+    }
+    
+    else if (plane.hitPlano(raio, 0.001, infinity, rec)) {
+        return vetor<double>(0.78, 0.64, 0.78); //cor lilás
     }
 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
@@ -97,6 +104,8 @@ int main() {
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
+    esferas.add(sphere(vetor<double>{0.8, 0.0, -1}, 0.40));
+    esferas.add(sphere(vetor<double>{-1.0, 0.0, -1.0}, 0.35));
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
