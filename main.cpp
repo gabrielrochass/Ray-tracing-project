@@ -77,8 +77,8 @@ int main() {
     malha mundo;
     sphere_list esferas;
     
-    // esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50)); // especular no centro
-    esferas.add(sphere(vetor<double>{0.0, 0.0, -1.0}, 0.50)); // difusa na esquerda
+    esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50)); // especular no centro
+    // esferas.add(sphere(vetor<double>{0.0, 0.0, -1.0}, 0.50)); // difusa na esquerda
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -127,7 +127,7 @@ int main() {
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
     };
 
-    phongComponentes material(0.1, 0.7, 0.5, 10.0);
+    phongComponentes material(0.1, 0.4, 0.9, 10.0);
     phongComponentes materialDifusa(0.1, 0.9, 0.0, 10.0);
 
     // define a viewport
@@ -146,7 +146,7 @@ int main() {
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, materialDifusa);
+            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
             image[j][i] = color;
         }
     }
