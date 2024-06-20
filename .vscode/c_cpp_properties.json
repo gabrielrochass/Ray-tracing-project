@@ -1,18 +1,22 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "MSYS2 Rev3",
             "includePath": [
-                "${default}"
+                "${workspaceFolder}/**"
             ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ],
+            "defines": [],
+            "compilerPath": "C:\\msys64\\ucrt64\\bin\\g++.exe", 
             "cStandard": "c17",
-            "cppStandard": "gnu++17",
-            "intelliSenseMode": "windows-gcc-x64"
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
         }
     ],
     "version": 4

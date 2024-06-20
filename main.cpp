@@ -1,22 +1,23 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <limits>
+#include <memory>
 #include "ponto.h"
 #include "vector.h"
 #include "camera.h"
 #include "sphere_list.h"
 #include "sphere.h"
 #include "plano.h" 
-#include <limits>
-#include <memory>
 #include "malha_triangulos.h"
 #include "triangulo.h"
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
+
 using namespace std;
 
-const double infinity = std::numeric_limits<double>::infinity();
+const double infinity = numeric_limits<double>::infinity();
 
 // define a cor do fundo
 vetor<double> backgroundColor(const vetor<double>& dir) {
@@ -84,7 +85,7 @@ int main() {
     Camera camera(posicaoDaCamera, mira, vUp);
 
     
-    double angulo = M_PI / 4; 
+    double angulo = 3.14 / 4; 
     // define a rotação eixo Z
     matriz4x4 rotacaoZ = matriz4x4::createRotationZ(angulo,false);
 
@@ -133,11 +134,11 @@ int main() {
     triangulo tri4(v10, v11, v12);
 
     
-
-    mundo.add(tri1);
-    mundo.add(tri2);
-    mundo.add(tri3);
-    mundo.add(tri4);
+    // adiciona os triangulos ao mundo
+    // mundo.add(tri1);
+    // mundo.add(tri2);
+    // mundo.add(tri3);
+    // mundo.add(tri4);
   
     //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
@@ -154,7 +155,8 @@ int main() {
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
     };
 
-    phongComponentes material(0.1, 0.7, 0.5, 10.0);
+    phongComponentes material(0.1, 0.4, 0.9, 10.0);
+    phongComponentes materialDifusa(0.1, 0.9, 0.0, 10.0);
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
@@ -171,6 +173,7 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
+            // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
             vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
             image[j][i] = color;
         }

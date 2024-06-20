@@ -43,9 +43,20 @@
         "ostream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
+<<<<<<< HEAD
         "typeinfo": "cpp",
         "ctime": "cpp",
         "iomanip": "cpp",
         "sstream": "cpp"
+=======
+        "typeinfo": "cpp"
+    },
+    "terminal.integrated.defaultProfile.windows": "MSYS2",
+    "terminal.integrated.profiles.windows": {
+        "MSYS2": {
+            "path": "C:\\msys64\\usr\\bin\\bash.exe",
+            "args": ["--login", "-i"]
+        }
+>>>>>>> 753cbf65aab6eece26f668cf61a8cab62606f1dc
     }
 }

@@ -24,10 +24,11 @@ class phongComponentes{
             
         }
 
-        double ka;
-        double kd;
-        double ks;
-        double n;
+        // as constantes variam de 0 a 1
+        double ka; // ambiente -> o quanto um objeto reage à luz ambiente
+        double kd; // difusa -> fosco
+        double ks; // especular -> brilhante
+        double n; // expoente especular -> o quanto rugoso é o objeto (quanto maior, mais brilhante)
 };
 
 struct iluminacao
@@ -95,6 +96,22 @@ vetor<double> calcularIluminacaoPhong(
 
 
 
+// phong
+// i = Ia * ka + Id * (N * L) * kd + Is * ks * (R * V)^n
+// i é a cor de cada pixel
+// Ia é a intensidade da luz ambiente
+// ka é a constante ambiente
+// Id é a intensidade da luz difusa
+// kd é a constante difusa
+// Is é a intensidade da luz especular
+// ks é a constante especular
+// N é a normal do objeto
+// L é a direção da luz
+// R é a direção da reflexão da luz
+// V é a direção para o observador
+// n é o expoente especular
+
+// i = ambiente + difusa + especular
 
 
 
