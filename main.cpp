@@ -161,7 +161,7 @@ int main() {
 
     // Define a iluminação e o material
     iluminacao luz{
-        vetor<double>(-1.0, -4, 1.0), // posição da luz -> diagonal direita superior
+        vetor<double>(0.8, -1, -0.5), // posição da luz -> diagonal direita superior
         vetor<double>(0.1, 0.1, 0.1), // intensidade ambiente
         vetor<double>(0.7, 0.7, 0.7), // intensidade difusa
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
