@@ -48,25 +48,59 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
     return backgroundColor(direcao_uni);
 }
 */
+
+bool estaNaSombra(const vetor<double>& ponto, const vetor<double>& luz, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
+    raio<double> r(ponto, subtracao(luz, ponto));
+    hit_record rec;
+
+    // Verifica se há interseção com a esfera
+    if (esferas.hit(r, 0.001, infinity, rec)) {
+        return true; // Se houver interseção com a esfera, está na sombra
+    }
+
+    // Verifica se há interseção com o plano
+    if (plano1.hitPlano(r, 0.001, infinity, rec)) {
+        return false; // Se houver interseção com o plano, não está na sombra (plano lilás)
+    }
+
+    // Verifica se há interseção com a malha (triângulos)
+    if (mundo.hit(r, 0.001, infinity, rec)) {
+        return true; // Se houver interseção com a malha, está na sombra
+    }
+
+    return false; // Caso contrário, não está na sombra
+}
+
+
 vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, const iluminacao& luz, const phongComponentes& material) {
     hit_record rec;
-    
-    plano plane(vetor<double>{0.0, 0.0, -1.0}, rec.normal);
+
+    plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
+
     if (esferas.hit(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
-        return calcularIluminacaoPhong(p, N, posicaoObservador, luz, material, esferas);
-    }
-    
-    else if (mundo.hit(raio, 0, infinity, rec)) {
+
+        if (estaNaSombra(p, luz.posicao, mundo, esferas, plano1)) {
+            return mult(0.5, luz.Ia); // Apenas a luz ambiente
+        } else {
+            return calcularIluminacaoPhong(p, N, posicaoObservador, luz, material, esferas);
+        }
+
+    } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
+        // Calcula a cor do plano lilás com Phong
+        vetor<double> p = raioAt(raio, rec.t);
+        vetor<double> N = vetorUni(rec.normal);
+
+        if (estaNaSombra(p, luz.posicao, mundo, esferas, plano1)) {
+            return mult(0.5, luz.Ia); // Apenas a luz ambiente
+        } else {
+            return vetor<double>(1, 1, 0); // Cor do plano lilás
+        }
+    } else if (mundo.hit(raio, 0, infinity, rec)) {
         vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
         return color;
     }
-    
-    else if (plane.hitPlano(raio, 0.001, infinity, rec)) {
-        return vetor<double>(0.78, 0.64, 0.78); //cor lilás
-    }
-
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     return backgroundColor(direcao_uni);
 }
@@ -105,15 +139,15 @@ int main() {
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
-    esferas.add(sphere(vetor<double>{0.8, 0.0, -1}, 0.40));
-    esferas.add(sphere(vetor<double>{-1.0, 0.0, -1.0}, 0.35));
+    esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.40));
+    esferas.add(sphere(vetor<double>{-1.0, 0.0, -1}, 0.35));
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
     vetor<double> v1 = rotacaoZ.multMatrizVetor({1, 0, -1});
     vetor<double> v2 = rotacaoZ.multMatrizVetor({1, -1, -1});
     vetor<double> v3 = rotacaoZ.multMatrizVetor({2, 0, -1});
-    triangulo tri1(v1, v2, v3);
+    // triangulo tri1(v1, v2, v3);
 
     // criação dos vértices triângulo 2 transladado para a direita
     vetor<double> v4 = trans.multMatrizVetor({0, 0 , -1});
@@ -149,7 +183,7 @@ int main() {
 
     // Define a iluminação e o material
     iluminacao luz{
-        vetor<double>(1.0, 1.0, 1.0), // posição da luz
+        vetor<double>(-1.0, -4, 1.0), // posição da luz -> diagonal direita superior
         vetor<double>(0.1, 0.1, 0.1), // intensidade ambiente
         vetor<double>(0.7, 0.7, 0.7), // intensidade difusa
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
