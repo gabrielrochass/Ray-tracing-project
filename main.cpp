@@ -27,51 +27,30 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-/*vetor<double> raioColor(const raio<double>& raio, malha mundo, sphere_list esferas) {
-    hit_record rec;
-    
-    plano plan(vetor<double>{0.0, -1.25, -1.0}, vetor<double>{0.0, 1.0, 2});
-    if(esferas.hit(raio, 0, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(subtracao(p, vetor<double>(0.5, 1.0, -1)));
-        vetor<double> color = mult(0.5, soma(esferas.list[0].center, N));
-        return color; 
-    }
-    else if(mundo.hit(raio, 0, infinity, rec)) {
-        
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
-    }
-    
-
-    vetor<double> direcao_uni = vetorUni(raio.direcao);
-    return backgroundColor(direcao_uni);
-}
-*/
-
+// checa se o ponto está na sombra
 bool estaNaSombra(const vetor<double>& ponto, const vetor<double>& luz, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
     raio<double> r(ponto, subtracao(luz, ponto));
     hit_record rec;
 
-    // Verifica se há interseção com a esfera
+    // verifica interseção com as esferas -> sombra
     if (esferas.hit(r, 0.001, infinity, rec)) {
-        return true; // Se houver interseção com a esfera, está na sombra
+        return true; 
     }
 
-    // Verifica se há interseção com o plano
+    // verifica interseção com o plano -> não está na sombra
     if (plano1.hitPlano(r, 0.001, infinity, rec)) {
-        return false; // Se houver interseção com o plano, não está na sombra (plano lilás)
+        return false; 
     }
 
-    // Verifica se há interseção com a malha (triângulos)
+    // verifica interseção com a malha de triangulos -> sombra
     if (mundo.hit(r, 0.001, infinity, rec)) {
-        return true; // Se houver interseção com a malha, está na sombra
+        return true; 
     }
 
-    return false; // Caso contrário, não está na sombra
+    return false; // não está na sombra
 }
 
-
+// calcula a cor do pixel com iluminação Phong
 vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, const iluminacao& luz, const phongComponentes& material) {
     hit_record rec;
 
@@ -82,20 +61,19 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         vetor<double> N = vetorUni(rec.normal);
 
         if (estaNaSombra(p, luz.posicao, mundo, esferas, plano1)) {
-            return mult(0.5, luz.Ia); // Apenas a luz ambiente
+            return mult(0.6, luz.Ia); // Apenas a luz ambiente
         } else {
             return calcularIluminacaoPhong(p, N, posicaoObservador, luz, material, esferas);
         }
 
     } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-        // Calcula a cor do plano lilás com Phong
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
 
         if (estaNaSombra(p, luz.posicao, mundo, esferas, plano1)) {
-            return mult(0.5, luz.Ia); // Apenas a luz ambiente
+            return mult(0.7, luz.Ia); // luz ambiente
         } else {
-            return vetor<double>(1, 1, 0); // Cor do plano lilás
+            return vetor<double>(1, 1, 0); // plano amarelo
         }
     } else if (mundo.hit(raio, 0, infinity, rec)) {
         vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
