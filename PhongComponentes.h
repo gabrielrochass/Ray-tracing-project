@@ -91,6 +91,108 @@ vetor<double> calcularIluminacaoPhong(
     return I;
 }
 
+vetor<double> calcularIluminacaoPhongTri(
+     vetor<double> pontoIntersecao, 
+     vetor<double> Normal, 
+     vetor<double> posicaoObservador,
+     iluminacao luz, 
+     phongComponentes material,
+     malha triangulos) 
+{
+    // Vetores de direção
+    vetor<double> L = normal(subtracao(luz.posicao, pontoIntersecao)); // Direção da luz
+    // L = Normal de L', L' = posicao - pontoIntersecao
+    vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
+    // V = Normal de V', V' = posicaoObservador - pontoIntersecao
+    vetor<double> R = normal(subtracao(produtoVetorial(multiplicacaoPorEscalar(produtoVetorial(Normal, L), 2.0),Normal), L)); // Reflexão da luz
+    // R = Normal de R', R' = 2 * (Normal * L) * Normal - L
+
+
+    // Verificar se o ponto está na sombra
+    raio<double> raioSombra(pontoIntersecao, L);
+    bool emSombra = false;
+    hit_record temp_rec;
+    if (triangulos.hit(raioSombra, 0.001, infinito, temp_rec)) {
+        emSombra = true;
+    }
+
+    
+/*
+    // Componentes de iluminação
+    vetor<double> ambiente = multiplicacaoPorEscalar(luz.Ia, material.ka);
+    // Iluminação ambiente = Ia * ka
+    vetor<double> difusa = multiplicacaoPorEscalar(luz.Id, (produtoEscalar(Normal, L) * material.kd));
+    // Iluminação difusa = Id * (Normal * L) * kd
+    vetor<double> especular = multiplicacaoPorEscalar(luz.Is, material.ks * pow(produtoEscalar(R, V), material.n));
+    // Iluminação especular = Is * ks * (R * V)^n
+*/
+    // Componentes de iluminação
+    vetor<double> ambiente = multiplicacaoPorEscalar(luz.Ia, material.ka);
+    vetor<double> difusa = {0, 0, 0};
+    vetor<double> especular = {0, 0, 0};
+    
+    if (!emSombra) {
+        difusa = multiplicacaoPorEscalar(luz.Id, (produtoEscalar(Normal, L) * material.kd));
+        especular = multiplicacaoPorEscalar(luz.Is, material.ks * pow(produtoEscalar(R, V), material.n));
+    }
+    // Iluminação resultante
+    vetor<double> I = soma(soma(ambiente, difusa), especular);
+
+
+    return I;
+}
+
+vetor<double> calcularIluminacaoPhongPlano(
+     vetor<double> pontoIntersecao, 
+     vetor<double> Normal, 
+     vetor<double> posicaoObservador,
+     iluminacao luz, 
+     phongComponentes material,
+     plano plano) 
+{
+    // Vetores de direção
+    vetor<double> L = normal(subtracao(luz.posicao, pontoIntersecao)); // Direção da luz
+    // L = Normal de L', L' = posicao - pontoIntersecao
+    vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
+    // V = Normal de V', V' = posicaoObservador - pontoIntersecao
+    vetor<double> R = normal(subtracao(produtoVetorial(multiplicacaoPorEscalar(produtoVetorial(Normal, L), 2.0),Normal), L)); // Reflexão da luz
+    // R = Normal de R', R' = 2 * (Normal * L) * Normal - L
+
+
+    // Verificar se o ponto está na sombra
+    raio<double> raioSombra(pontoIntersecao, L);
+    bool emSombra = false;
+    hit_record temp_rec;
+    if (plano.hitPlano(raioSombra, 0.001, infinito, temp_rec)) {
+        emSombra = true;
+    }
+
+    
+/*
+    // Componentes de iluminação
+    vetor<double> ambiente = multiplicacaoPorEscalar(luz.Ia, material.ka);
+    // Iluminação ambiente = Ia * ka
+    vetor<double> difusa = multiplicacaoPorEscalar(luz.Id, (produtoEscalar(Normal, L) * material.kd));
+    // Iluminação difusa = Id * (Normal * L) * kd
+    vetor<double> especular = multiplicacaoPorEscalar(luz.Is, material.ks * pow(produtoEscalar(R, V), material.n));
+    // Iluminação especular = Is * ks * (R * V)^n
+*/
+    // Componentes de iluminação
+    vetor<double> ambiente = multiplicacaoPorEscalar(luz.Ia, material.ka);
+    vetor<double> difusa = {0, 0, 0};
+    vetor<double> especular = {0, 0, 0};
+    
+    if (!emSombra) {
+        difusa = multiplicacaoPorEscalar(luz.Id, (produtoEscalar(Normal, L) * material.kd));
+        especular = multiplicacaoPorEscalar(luz.Is, material.ks * pow(produtoEscalar(R, V), material.n));
+    }
+    // Iluminação resultante
+    vetor<double> I = soma(soma(ambiente, difusa), especular);
+
+
+    return I;
+}
+
 
 #endif
 
