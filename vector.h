@@ -77,6 +77,39 @@ vetor<T> normal(vetor<T> v) {
     return v / norma(v);
 }
 
+template<typename T>
+vetor<T> operator*(const vector<T>& scalar, const vetor<T>& v) {
+    return vetor<T>(v.x * scalar.x, v.y * scalar.y, v.z * scalar.z);
+}
+
+template<typename T>
+vetor<T> operator*=(const vetor<T>& v, const T scalar) {
+    return vetor<T>(v.x * scalar, v.y * scalar, v.z * scalar);
+}
+
+template<typename T>
+vetor<T> operator*(const T scalar, const vetor<T>& v2) {
+    return vetor<T>(v2.x * scalar, v2.y * scalar, v2.z * scalar);
+}
+template<typename T>    
+vetor<T> operator+(const vetor<T>& v1, const vetor<T>& v2) {
+    return vetor<T>(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+}
+
+template<typename T>
+vetor<T> operator-(const vetor<T>& v1, const vetor<T>& v2) {
+    return vetor<T>(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
+
+
+template<typename T>
+vetor<T> operator+=(vetor<T>& v1, const vetor<T>& v2) {
+    v1.x += v2.x;
+    v1.y += v2.y;
+    v1.z += v2.z;
+    return v1;
+}
+
 
 template<typename T> 
 vetor<T> mult(T scalar, vetor<T> h) {
