@@ -98,18 +98,17 @@ bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mun
         bool intersecionouMalha = mundo.hit(r, 0.001, infinity, rec);
         bool intersecionouPlano = plano1.hitPlano(r, 0.001, infinity, rec);
 
-        // Se não houver interseção com nenhum objeto, o ponto não está na sombra para esta luz
-        if (!intersecionouEsfera && !intersecionouMalha && !intersecionouPlano) {
-            return false;
+        // Se houver interseção com qualquer objeto, o ponto está na sombra para esta luz
+        if (intersecionouEsfera || intersecionouMalha || intersecionouPlano) {
+            return true;
         }
-        
     }
 
-    // Se todas as luzes estiverem obstruídas, o ponto está na sombra
-    return true;
+    // Se nenhuma luz estiver obstruída, o ponto não está na sombra
+    return false;
 }
 
-vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador,  listaLuzes luzes, const phongComponentes& material) {
+vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material) {
     hit_record rec;
 
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
@@ -120,11 +119,13 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
     if (esferas.hit(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
-        
+
         for (int i = 0; i < luzes.luzes.size(); i++) {
             if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-                corFinal =  corFinal + mult(0.6, luzes.acessarLuz(i).Ia); // Apenas a luz ambiente
+                // Adiciona apenas a luz ambiente se estiver na sombra
+                corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
             } else {
+                // Adiciona a contribuição da iluminação Phong se não estiver na sombra
                 corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
             }
         }
@@ -133,16 +134,18 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
     } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
-        
+
         for (int i = 0; i < luzes.luzes.size(); i++) {
             if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-                corFinal = mult(0.7, luzes.acessarLuz(i).Ia); // Apenas a luz ambiente
+                // Adiciona apenas a luz ambiente se estiver na sombra
+                corFinal = corFinal + mult(0.7, luzes.acessarLuz(i).Ia);
             } else {
-                corFinal = vetor<double>(1, 1, 0); // plano amarelo
+                // Adiciona a contribuição da cor do plano se não estiver na sombra
+                corFinal = corFinal + vetor<double>(1, 1, 0);
             }
         }
         return corFinal;
-        
+
     } else if (mundo.hit(raio, 0, infinity, rec)) {
         vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
         return color;
@@ -231,14 +234,14 @@ int main() {
 
     // Define a iluminação e o material
     iluminacao luz{
-        vetor<double>(0.8, -1, -0.5), // posição da luz -> diagonal direita superior
+        vetor<double>(0.5, -0.5, -0.1), // posição da luz -> diagonal direita superior
         vetor<double>(0.1, 0.1, 0.1), // intensidade ambiente
         vetor<double>(0.7, 0.7, 0.7), // intensidade difusa
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
     };
 
     iluminacao luz2{
-        vetor<double>(-0.8, -1, -0.5), // posição da luz -> diagonal esquerda superior
+        vetor<double>(-0.5, -0.5, -0.1), // posição da luz -> diagonal esquerda superior
         vetor<double>(0.1, 0.1, 0.1), // intensidade ambiente
         vetor<double>(0.7, 0.7, 0.7), // intensidade difusa
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
