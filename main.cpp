@@ -27,66 +27,6 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-// checa se o ponto está na sombra
-/*bool estaNaSombra(const vetor<double>& ponto, const vetor<double>& luz, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
-    raio<double> r(ponto, subtracao(luz, ponto));
-    hit_record rec;
-
-    // verifica interseção com as esferas -> sombra
-    if (esferas.hit(r, 0.001, infinity, rec)) {
-        return true; 
-    }
-
-    // verifica interseção com o plano -> não está na sombra
-    if (plano1.hitPlano(r, 0.001, infinity, rec)) {
-        return false; 
-    }
-
-    // verifica interseção com a malha de triangulos -> sombra
-    if (mundo.hit(r, 0.001, infinity, rec)) {
-        return true; 
-    }
-
-    return false; // não está na sombra
-}
-*/
-// calcula a cor do pixel com iluminação Phong
-/*vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material) {
-    hit_record rec;
-
-    plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
-
-    if (esferas.hit(raio, 0, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            if (estaNaSombra(p, luzes.acessarLuz(i).posicao, mundo, esferas, plano1)) {
-                return mult(0.6, luzes.acessarLuz(i).Ia); // Apenas a luz ambiente
-            } else {
-                return calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            }
-        }
-
-    } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            if (estaNaSombra(p, luzes.acessarLuz(i).posicao, mundo, esferas, plano1)) {
-                return mult(0.7, luzes.acessarLuz(i).Ia); // Apenas a luz ambiente
-            } else {
-                return vetor<double>(1, 1, 0); // plano amarelo
-            }
-        }
-        
-        
-    } else if (mundo.hit(raio, 0, infinity, rec)) {
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
-    }
-    vetor<double> direcao_uni = vetorUni(raio.direcao);
-    return backgroundColor(direcao_uni);
-}*/
-
 bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
     for (int i = 0; i < luzes.luzes.size(); i++) {
         vetor<double> luzPos = luzes.acessarLuz(i).posicao;
@@ -219,18 +159,7 @@ int main() {
     triangulo tri4(v10, v11, v12);
 
     
-    // adiciona os triangulos ao mundo
-    /*mundo.add(tri1);
-    mundo.add(tri2);
-    mundo.add(tri3);
-    mundo.add(tri4);*/
-  
-    //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
-    //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    //mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
     
-    // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
-    // cada vetor<double> é um ponto no espaço 3D
 
     // Define a iluminação e o material
     iluminacao luz{
@@ -251,9 +180,9 @@ int main() {
     luzes.addLuz(luz);
     luzes.addLuz(luz2);
 
-    phongComponentes material(0.1, 0.4, 0.9, 10.0);
-    phongComponentes materialDifusa(0.1, 0.9, 0.0, 10.0);
-
+    phongComponentes material(0.1, 0.4, 0.9, 10.0, 0.5, 0.5, 1.0, 1.0);
+    //phongComponentes materialDifusa(0.1, 0.9, 0.0, 10.0, 0.5, 0.5, 1.0, 1.0);
+    phongComponentes materialDifusa(0.1, 0.5, 0.5, 10, 0.5, 0.5, 1.0, 1.5);
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
@@ -270,7 +199,7 @@ int main() {
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material);
+            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, materialDifusa);
             image[j][i] = color;
         }
     }

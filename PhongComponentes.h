@@ -7,20 +7,25 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <cmath>
 using namespace std;
 
 
-const double infinito = std::numeric_limits<double>::infinity();
+double infinito = std::numeric_limits<double>::infinity();
 
 class phongComponentes{
     public:
         phongComponentes() {}
-        phongComponentes(double ka, double kd, double ks, double n) {
+        phongComponentes(double ka, double kd, double ks, double n, double kr, double kt, double ni, double nt) {
             
             this->ka = min(ka, 1.0);
             this->kd = min(kd, 1.0);
             this->ks = min(ks, 1.0);
             this->n = n;
+            this->kr = min(kr, 1.0);
+            this->kt = min(kt, 1.0);
+            this->ni = ni;
+            this->nt = nt;
             
         }
 
@@ -29,6 +34,10 @@ class phongComponentes{
         double kd; // difusa -> fosco
         double ks; // especular -> brilhante
         double n; // expoente especular -> o quanto rugoso é o objeto (quanto maior, mais brilhante)
+        double kr; // reflexão
+        double kt; // transmissão
+        double ni; // índice de refração
+        double nt; // índice de refração
 };
 
 struct iluminacao
@@ -51,6 +60,27 @@ struct listaLuzes
     }
     
 };
+
+vetor<double> calcularRefracao( vetor<double> V,  vetor<double> N, double eta) {
+    double cosi = produtoEscalar(V, N); // Correctly calculate cosi as the dot product of V and N
+    double etai = 1, etat = eta;
+    vetor<double> n = N;
+    if (cosi < 0) {
+        cosi = -cosi;
+    } else {
+        std::swap(etai, etat);
+        n = multiplicacaoPorEscalar(N, -1.0);
+    }
+    double etaRatio = etai / etat;
+    double k = 1 - etaRatio * etaRatio * (1 - cosi * cosi);
+    if (k < 0) {
+        return { 0, 0, 0 }; // Reflexão total interna
+    } else {
+        auto firstTerm = multiplicacaoPorEscalar(V, etaRatio);
+        auto secondTerm = multiplicacaoPorEscalar(n, (etaRatio * cosi - std::sqrt(k)));
+        return soma(firstTerm, secondTerm); // Correctly add the two vectors
+    }
+}
 
 vetor<double> calcularIluminacaoPhong(
     vetor<double> pontoIntersecao, 
@@ -91,6 +121,11 @@ vetor<double> calcularIluminacaoPhong(
 
         // Acumular iluminação resultante
         I = I + difusa + especular;
+        if(i==0){
+            double indiceRefracao = material.ni / material.nt;
+            vetor<double> T = calcularRefracao(V, Normal, indiceRefracao);
+            I = I + material.kr*R + material.kt*T;
+        }
     }
     
     return I;
@@ -110,7 +145,7 @@ vetor<double> calcularIluminacaoPhong(
 
 // phong
 // 
-// i = Ia * ka + Id * (N * L) * kd + Is * ks * (R * V)^n
+// i = Ia * ka + Id * SOMATÓRIO[(N * L) * kd + Is * ks * (R * V)^n] + kr * R + kt * T
 // i é a cor de cada pixel
 // Ia é a intensidade da luz ambiente
 // ka é a constante ambiente
