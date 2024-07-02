@@ -61,26 +61,35 @@ struct listaLuzes
     
 };
 
-vetor<double> calcularRefracao( vetor<double> V,  vetor<double> N, double eta) {
-    double cosi = produtoEscalar(V, N); // Correctly calculate cosi as the dot product of V and N
-    double etai = 1, etat = eta;
-    vetor<double> n = N;
-    if (cosi < 0) {
+vetor<double> calcularRefracao( vetor<double> V,  vetor<double> N, double eta, vetor<double> L, phongComponentes material
+   ) {
+    
+    double cosi = -produtoEscalar(V, N); // coseno do ângulo de incidência
+    double etai = 1.0, etat = eta;
+    vetor n2 = N;
+
+    if (cosi < 0.0) {
         cosi = -cosi;
     } else {
         std::swap(etai, etat);
-        n = multiplicacaoPorEscalar(N, -1.0);
+        n2 = multiplicacaoPorEscalar(N, -1.0);
     }
+
     double etaRatio = etai / etat;
-    double k = 1 - etaRatio * etaRatio * (1 - cosi * cosi);
-    if (k < 0) {
-        return { 0, 0, 0 }; // Reflexão total interna
+    double k = 1.0 - etaRatio * etaRatio * (1.0 - cosi * cosi);
+    
+    // Se k for negativo, ocorre reflexão total interna
+    if (k < 0.0) {
+        return {0.0, 0.0, 0.0}; // Retornar vetor nulo
     } else {
-        auto firstTerm = multiplicacaoPorEscalar(V, etaRatio);
-        auto secondTerm = multiplicacaoPorEscalar(n, (etaRatio * cosi - std::sqrt(k)));
-        return soma(firstTerm, secondTerm); // Correctly add the two vectors
+        vetor primeiroTermo = multiplicacaoPorEscalar(V, etaRatio);
+        vetor segundoTermo = multiplicacaoPorEscalar(n2, (etaRatio * cosi - sqrt(k)));
+        return soma(primeiroTermo, segundoTermo);
     }
 }
+   /* 
+    return (1 / eta) * V - ((1-material.nt) - (1-material.ni) / eta) * N; 
+}*/
 
 vetor<double> calcularIluminacaoPhong(
     vetor<double> pontoIntersecao, 
@@ -89,7 +98,8 @@ vetor<double> calcularIluminacaoPhong(
     iluminacao luz, 
     listaLuzes luzes,
     phongComponentes material,
-    sphere_list esferas) 
+    sphere_list esferas
+)
 {
     // Vetores de direção
     vetor<double> L = normal(subtracao(luz.posicao, pontoIntersecao)); // Direção da luz
@@ -123,8 +133,12 @@ vetor<double> calcularIluminacaoPhong(
         I = I + difusa + especular;
         if(i==0){
             double indiceRefracao = material.ni / material.nt;
-            vetor<double> T = calcularRefracao(V, Normal, indiceRefracao);
-            I = I + material.kr*R + material.kt*T;
+            vetor<double> T = calcularRefracao(V, Normal, indiceRefracao, L, material);
+            vetor<double> Ri = subtracao(produtoVetorial((Normal+Normal), produtoVetorial(Normal, V)), V);
+            
+            //Ri = 2 * N * (N * V) - V;
+            //T = (1 / eta) * V - (cosOt - cosO / eta) * N;
+            I = I + material.kr*Ri + material.kt*T;
         }
     }
     

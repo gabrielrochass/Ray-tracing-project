@@ -81,7 +81,8 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
                 corFinal = corFinal + mult(0.7, luzes.acessarLuz(i).Ia);
             } else {
                 // Adiciona a contribuição da cor do plano se não estiver na sombra
-                corFinal = corFinal + vetor<double>(1, 1, 0);
+                
+                corFinal = corFinal + vetor<double>{1, 1, 0};
             }
         }
         return corFinal;
