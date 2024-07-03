@@ -61,13 +61,14 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         vetor<double> N = vetorUni(rec.normal);
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-                // Adiciona apenas a luz ambiente se estiver na sombra
-                corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            } else {
-                // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-                corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            }
+            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
+            //     // Adiciona apenas a luz ambiente se estiver na sombra
+            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
+            // } else {
+            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
+            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
+            // }
+            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
         }
         return corFinal;
 
@@ -76,16 +77,18 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         vetor<double> N = vetorUni(rec.normal);
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-                // Adiciona apenas a luz ambiente se estiver na sombra
-                corFinal = corFinal + mult(0.7, luzes.acessarLuz(i).Ia);
-            } else {
-                // Adiciona a contribuição da cor do plano se não estiver na sombra
+            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
+            //     // Adiciona apenas a luz ambiente se estiver na sombra
+            //     corFinal = corFinal + mult(0.7, luzes.acessarLuz(i).Ia);
+            // } else {
+            //     // Adiciona a contribuição da cor do plano se não estiver na sombra
                 
-                corFinal = corFinal + vetor<double>{1, 1, 0};
-            }
+            //     corFinal = corFinal + vetor<double>{1, 1, 0};
+            // }
+            corFinal = corFinal + vetor<double>{1, 1, 0};
         }
-        return corFinal;
+        // return corFinal;
+        return vetor<double>{0,0,0.2};
 
     } else if (mundo.hit(raio, 0, infinity, rec)) {
         vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
