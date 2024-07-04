@@ -61,6 +61,10 @@ struct listaLuzes
     
 };
 
+vetor<double> calcularReflexao(const vetor<double>& V, const vetor<double>& Normal) {
+    return subtracao(produtoVetorial((Normal+Normal), produtoVetorial(Normal, V)), V);
+}
+
 vetor<double> calcularRefracao( vetor<double> V,  vetor<double> N, double eta, vetor<double> L, phongComponentes material
    ) {
     
@@ -134,7 +138,7 @@ vetor<double> calcularIluminacaoPhong(
         if(i==0){
             double indiceRefracao = material.ni / material.nt;
             vetor<double> T = calcularRefracao(V, Normal, indiceRefracao, L, material);
-            vetor<double> Ri = subtracao(produtoVetorial((Normal+Normal), produtoVetorial(Normal, V)), V);
+            vetor<double> Ri = calcularReflexao(V, Normal);
             
             //Ri = 2 * N * (N * V) - V;
             //T = (1 / eta) * V - (cosOt - cosO / eta) * N;
