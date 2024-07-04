@@ -73,12 +73,11 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         if (estaNaSombra(p, luz.posicao, mundo, esferas, plano1)) {
             return mult(0.7, luz.Ia); // luz ambiente
         } else {
-            return calcularIluminacaoPhongPlano(p, N, posicaoObservador, luz, material, plano1);
+            return vetor<double>(1, 1, 0); // plano amarelo
         }
-    } else if (mundo.hit(raio, 0.001, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-        return calcularIluminacaoPhongTri(p, N, posicaoObservador, luz, material, mundo);
+    } else if (mundo.hit(raio, 0, infinity, rec)) {
+        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
+        return color;
     }
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     return backgroundColor(direcao_uni);
@@ -117,7 +116,7 @@ int main() {
     malha mundo;
     sphere_list esferas;
     
-    // esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
+    esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
     esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.40));
     esferas.add(sphere(vetor<double>{-1.0, 0.0, -1}, 0.35));
     
@@ -153,9 +152,9 @@ int main() {
     // mundo.add(tri3);
     // mundo.add(tri4);
   
-    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
-    mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
+    //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
+    //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    //mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
     
     // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
     // cada vetor<double> é um ponto no espaço 3D
