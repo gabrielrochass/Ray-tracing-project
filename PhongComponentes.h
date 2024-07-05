@@ -124,8 +124,10 @@ vetor<double> calcularIluminacaoPhong(
     vetor<double> corDaEsfera = {1, 0, 0};
 
     hit_record rec;
-    if (esferas.hit(raio<double>(pontoIntersecao, Normal), 0.001, infinito, rec)) {
-        corDaEsfera = rec.cor;
+    for(const auto& l : esferas.list) {
+        if (l.hit(raio<double>(pontoIntersecao, normal(subtracao(pontoIntersecao, posicaoObservador))), 0.001, infinito, rec)) {
+            corDaEsfera = rec.cor;
+        }
     }
 
     if (profundidade <= 0) {
