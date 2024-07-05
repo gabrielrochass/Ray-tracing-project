@@ -198,13 +198,13 @@ int main() {
     // phongComponentes material(0.1, 0.4, 0.9, 10.0);
     // phongComponentes material(0.1, 0.9, 0.5, 10.0, 1.0, 1.0, 1.0, 10.5);
     phongComponentes material(  0.1, // ka
-                                0.9, // kd
-                                0.5, // ks
+                                0.3, // kd
+                                0.9, // ks
                                 10.0, // n
-                                0.5, // kr
-                                1.0, // kt
+                                1.0, // kr
+                                0.5, // kt
                                 1.0, // n1
-                                1.5 // n2
+                                10.5 // n2
                                 );
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);

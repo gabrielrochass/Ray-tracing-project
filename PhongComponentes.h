@@ -159,7 +159,7 @@ vetor<double> calcularIluminacaoPhong(
         corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
     }
     I = I + corReflexao + corRefracao;
-    return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.3);
+    return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.5);
 
 }
    
