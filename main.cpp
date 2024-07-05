@@ -132,10 +132,11 @@ int main() {
     malha mundo;
     sphere_list esferas;
     
-    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera vermelha
-    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera verde
-    esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera azul
-
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera verde
+    esferas.add(sphere(vetor<double>{1, 0.5, -1}, 0.2, vetor<double>{0, 1, 0})); // Esfera azul
+    esferas.add(sphere(vetor<double>{-1, -0.5, -1}, 0.3, vetor<double>{0, 0, 1})); // Esfera vermelha
+    //esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
+    //esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -186,7 +187,7 @@ int main() {
 
     iluminacao luz2{
         vetor<double>(-0.5, -0.5, -0.1), // posição da luz -> diagonal esquerda superior
-        vetor<double>(0.1, 0.1, 0.1), // intensidade ambiente
+        vetor<double>(0.8, 0.8, 0.8), // intensidade ambiente
         vetor<double>(0.7, 0.7, 0.7), // intensidade difusa
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
     };
@@ -195,7 +196,7 @@ int main() {
     luzes.addLuz(luz);
     luzes.addLuz(luz2);
 
-    // phongComponentes material(0.1, 0.4, 0.9, 10.0);
+    //phongComponentes material(0.1, 0.1, 0.9, 100, 0.0, 0.0, 0.1, 1.5);
     // phongComponentes material(0.1, 0.9, 0.5, 10.0, 1.0, 1.0, 1.0, 10.5);
     phongComponentes material(  0.1, // ka
                                 0.3, // kd
