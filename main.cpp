@@ -192,7 +192,7 @@ int main() {
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
-    esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.40));
+    esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.35));
     esferas.add(sphere(vetor<double>{-1.0, 0.0, -1}, 0.35));
     
     // adiciona triângulos à malha
@@ -254,7 +254,7 @@ int main() {
     luzes.addLuz(luz2);
 
     // phongComponentes material(0.1, 0.4, 0.9, 10.0);
-    phongComponentes material(0.1, 0.9, 0.0, 10.0, 0.9, 0.0, 1.0, 1.5);
+    phongComponentes material(0.1, 0.9, 0.5, 10.0, 1.0, 1.0, 1.0, 10.5);
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);

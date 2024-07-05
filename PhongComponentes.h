@@ -66,15 +66,16 @@ vetor<double> calcularReflexao(vetor<double> Normal, vetor<double> L) {
 }
 
 // calcula vetor de refração
-vetor<double> calcularRefração(vetor<double> Normal, vetor<double> L, double n1, double n2) {
-    double n = n1 / n2;
-    double cosI = -produtoEscalar(Normal, L);
-    double sinT2 = n * n * (1.0 - cosI * cosI);
-    if (sinT2 > 1.0) {
-        return {0, 0, 0};
+vetor<double> calcularRefracao(const vetor<double>& I, const vetor<double>& N, double ni, double nt) {
+    double eta = ni / nt;
+    double cosi = -produtoEscalar(N, I);
+    double sint2 = eta * eta * (1 - cosi * cosi);
+    if (sint2 > 1) {
+        // Reflexão total interna
+        return calcularReflexao(N, I);
     }
-    double cosT = sqrt(1.0 - sinT2);
-    return normal(n * L + (n * cosI - cosT) * Normal);
+    double cost = sqrt(1 - sint2);
+    return eta * I + (eta * cosi - cost) * N;
 }
 
 vetor<double> calcularIluminacaoPhong(
@@ -139,17 +140,17 @@ vetor<double> calcularIluminacaoPhong(
     }
 
     // Refração
-    vetor<double> corRefração = {0, 0, 0};
+    vetor<double> corRefracao = {0, 0, 0};
     if (material.kt > 0) {
-        vetor<double> R = calcularRefração(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), material.n1, material.n2);
-        raio<double> raioRefração(pontoIntersecao, R);
+        vetor<double> R = calcularRefracao(normal(subtracao(posicaoObservador, pontoIntersecao)), Normal, material.n1, material.n2);
+        raio<double> raioRefracao(pontoIntersecao, R);
         hit_record rec;
-        if (esferas.hit(raioRefração, 0.001, infinito, rec)) {
-            corRefração = calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+        if (esferas.hit(raioRefracao, 0.001, infinito, rec)) {
+            corRefracao = calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
         }
-        corRefração = multiplicacaoPorEscalar(corRefração, material.kt);
+        corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
     }
-    I = I + corReflexao + corRefração;
+    I = I + corReflexao + corRefracao;
     return multiplicacaoPorEscalar(produtoVetorial(I, vetor<double>{corDaEsfera[0], corDaEsfera[1], corDaEsfera[2]}), 0.3);
 
 }
