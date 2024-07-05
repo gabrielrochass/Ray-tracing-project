@@ -133,8 +133,8 @@ int main() {
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera vermelha
-    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5, vetor<double>{0, 1, 0})); // Esfera verde
-    esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.5, vetor<double>{0, 0, 1})); // Esfera azul
+    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera verde
+    esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera azul
 
     
     // adiciona triângulos à malha

@@ -105,18 +105,24 @@ vetor<double> calcularIluminacaoPhong(
         raio<double> raioSombra(pontoIntersecao, L);
         bool emSombra = false;
         hit_record temp_rec;
-        if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
-            emSombra = true;
-        }
+        // if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
+        //     emSombra = true;
+        // }
+
+        // // Componentes de iluminação
+        // vetor<double> difusa = {0, 0, 0};
+        // vetor<double> especular = {0, 0, 0};
+
+        // if (!emSombra) {
+        //     difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
+        //     especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
+        // }
 
         // Componentes de iluminação
         vetor<double> difusa = {0, 0, 0};
         vetor<double> especular = {0, 0, 0};
-
-        if (!emSombra) {
-            difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
-            especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
-        }
+        difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
+        especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
 
         // Acumular iluminação resultante
         I = I + difusa + especular;
@@ -139,9 +145,10 @@ vetor<double> calcularIluminacaoPhong(
     if (material.kr > 0) {
         vetor<double> R = calcularReflexao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)));
         raio<double> raioReflexao(pontoIntersecao, R);
-        hit_record rec;
-        if (esferas.hit(raioReflexao, 0.001, infinito, rec)) {
-            corReflexao = calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+        hit_record recReflexao;
+        if (esferas.hit(raioReflexao, 0.001, infinito, recReflexao)) {
+            corReflexao = calcularIluminacaoPhong(recReflexao.p, recReflexao.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+            corDaEsfera = produtoVetorial(corReflexao, recReflexao.cor);
         }
         corReflexao = multiplicacaoPorEscalar(corReflexao, material.kr);
 
