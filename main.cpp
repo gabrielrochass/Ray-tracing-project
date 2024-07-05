@@ -27,66 +27,7 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-// checa se o ponto está na sombra
-/*bool estaNaSombra(const vetor<double>& ponto, const vetor<double>& luz, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
-    raio<double> r(ponto, subtracao(luz, ponto));
-    hit_record rec;
-
-    // verifica interseção com as esferas -> sombra
-    if (esferas.hit(r, 0.001, infinity, rec)) {
-        return true; 
-    }
-
-    // verifica interseção com o plano -> não está na sombra
-    if (plano1.hitPlano(r, 0.001, infinity, rec)) {
-        return false; 
-    }
-
-    // verifica interseção com a malha de triangulos -> sombra
-    if (mundo.hit(r, 0.001, infinity, rec)) {
-        return true; 
-    }
-
-    return false; // não está na sombra
-}
-*/
-// calcula a cor do pixel com iluminação Phong
-/*vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material) {
-    hit_record rec;
-
-    plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
-
-    if (esferas.hit(raio, 0, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            if (estaNaSombra(p, luzes.acessarLuz(i).posicao, mundo, esferas, plano1)) {
-                return mult(0.6, luzes.acessarLuz(i).Ia); // Apenas a luz ambiente
-            } else {
-                return calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            }
-        }
-
-    } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            if (estaNaSombra(p, luzes.acessarLuz(i).posicao, mundo, esferas, plano1)) {
-                return mult(0.7, luzes.acessarLuz(i).Ia); // Apenas a luz ambiente
-            } else {
-                return vetor<double>(1, 1, 0); // plano amarelo
-            }
-        }
-        
-        
-    } else if (mundo.hit(raio, 0, infinity, rec)) {
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
-    }
-    vetor<double> direcao_uni = vetorUni(raio.direcao);
-    return backgroundColor(direcao_uni);
-}*/
-
+// verifica se o ponto está em sombra
 bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
     for (int i = 0; i < luzes.luzes.size(); i++) {
         vetor<double> luzPos = luzes.acessarLuz(i).posicao;
@@ -128,7 +69,7 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
             //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
             //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
             // }
-             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas, 3);
+            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas, 3);
         }
         return corFinal;
 
@@ -191,9 +132,10 @@ int main() {
     malha mundo;
     sphere_list esferas;
     
-    esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
-    esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.35));
-    esferas.add(sphere(vetor<double>{-1.0, 0.0, -1}, 0.35));
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera vermelha
+    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5, vetor<double>{0, 1, 0})); // Esfera verde
+    esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.5, vetor<double>{0, 0, 1})); // Esfera azul
+
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -254,8 +196,16 @@ int main() {
     luzes.addLuz(luz2);
 
     // phongComponentes material(0.1, 0.4, 0.9, 10.0);
-    phongComponentes material(0.1, 0.9, 0.5, 10.0, 1.0, 1.0, 1.0, 10.5);
-
+    // phongComponentes material(0.1, 0.9, 0.5, 10.0, 1.0, 1.0, 1.0, 10.5);
+    phongComponentes material(  0.1, // ka
+                                0.9, // kd
+                                0.5, // ks
+                                10.0, // n
+                                0.5, // kr
+                                1.0, // kt
+                                1.0, // n1
+                                1.5 // n2
+                                );
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);

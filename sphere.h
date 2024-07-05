@@ -10,7 +10,7 @@ using namespace std;
 class sphere{
     public:
         sphere() {}
-        sphere(vetor<double> c, double r) : center(c), radius(r) {};
+        sphere(vetor<double> c, double r, vetor<double>cor) : center(c), radius(r), cor(cor) {};
 
         bool hit(
             const raio<double>& raio, double t_min, double t_max, hit_record& rec) const;
@@ -18,6 +18,7 @@ class sphere{
     public:
         vetor<double> center;
         double radius;
+        vetor<double> cor;
 };
 
 bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_record& rec) const{
@@ -37,6 +38,7 @@ bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_recor
     if (root <= t_min || t_max <= root) {
         root = (metadeb + sqrtd) / a;
         if(root <= t_min || t_max <= root){
+            rec.cor = cor;
             return false;
         }
     }
@@ -45,6 +47,7 @@ bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_recor
     rec.p = raioAt(raio, rec.t);
     //rec.normal = multiplicacaoPorEscalar(subtracao(rec.p, center), 1.0 / radius);
     rec.normal = vetorUni(subtracao(rec.p, center));
+    rec.cor = cor;
     return true;
 }
 

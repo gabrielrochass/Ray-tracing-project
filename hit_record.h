@@ -9,6 +9,7 @@ struct hit_record {
     vetor<double> normal;
     double t;
     double indice_tri;
+    vetor<double> cor;
     
     
 };
