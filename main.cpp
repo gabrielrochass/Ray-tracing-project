@@ -69,7 +69,7 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
             //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
             //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
             // }
-            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas, 1);
+            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas, 2);
         }
         return corFinal;
 
