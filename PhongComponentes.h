@@ -110,12 +110,12 @@ vetor<double> calcularIluminacaoPhong(
         vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
         vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L); // Reflexão da luz
         
-        raio<double> raioSombra(pontoIntersecao, L);
-        bool emSombra = false;
-        hit_record temp_rec;
-        if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
-            emSombra = true;
-        }
+        // raio<double> raioSombra(pontoIntersecao, L);
+        // bool emSombra = false;
+        // hit_record temp_rec;
+        // if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
+        //     emSombra = true;
+        // }
 
         // // Componentes de iluminação
         // vetor<double> difusa = {0, 0, 0};
@@ -145,8 +145,8 @@ vetor<double> calcularIluminacaoPhong(
     }
 
     if (profundidade <= 0) {
-        //return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.8);
-        return produtoVetorial(I, corDaEsfera);
+        return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.8);
+        
     }
 
     // Reflexão
@@ -176,6 +176,8 @@ vetor<double> calcularIluminacaoPhong(
         }
         corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
     }
+
+   
     I = I + corReflexao + corRefracao;
     return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.8);
     

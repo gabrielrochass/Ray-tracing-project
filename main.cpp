@@ -133,10 +133,10 @@ int main() {
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera verde
-    esferas.add(sphere(vetor<double>{1, 0.5, -1}, 0.2, vetor<double>{0, 1, 0})); // Esfera azul
+    esferas.add(sphere(vetor<double>{1, 0.5, -1}, 0.3, vetor<double>{0, 1, 0})); // Esfera azul
     esferas.add(sphere(vetor<double>{-1, -0.5, -1}, 0.3, vetor<double>{0, 0, 1})); // Esfera vermelha
-    //esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
-    //esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
+    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
+    esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -207,6 +207,15 @@ int main() {
                                 1.0, // n1
                                 10.5 // n2
                                 );
+    // phongComponentes material(  0.1, // ka
+    //                             0.3, // kd
+    //                             0.9, // ks
+    //                             10.0, // n
+    //                             0.0, // kr
+    //                             0.6, // kt
+    //                             1.0, // n1
+    //                             1.5 // n2
+    //                             );
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
