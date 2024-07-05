@@ -137,7 +137,7 @@ vetor<double> calcularIluminacaoPhong(
     }
 
     if (profundidade <= 0) {
-        return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.3);
+        return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.8);
     }
 
     // Reflexão
@@ -159,14 +159,15 @@ vetor<double> calcularIluminacaoPhong(
     if (material.kt > 0) {
         vetor<double> R = calcularRefracao(normal(subtracao(posicaoObservador, pontoIntersecao)), Normal, material.n1, material.n2);
         raio<double> raioRefracao(pontoIntersecao, R);
-        hit_record rec;
-        if (esferas.hit(raioRefracao, 0.001, infinito, rec)) {
-            corRefracao = calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+        hit_record recRefracao;
+        if (esferas.hit(raioRefracao, 0.001, infinito, recRefracao)) {
+            corRefracao = calcularIluminacaoPhong(recRefracao.p, recRefracao.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+            corRefracao = produtoVetorial(corRefracao, recRefracao.cor);
         }
         corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
     }
     I = I + corReflexao + corRefracao;
-    return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.5);
+    return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.8);
 
 }
    
