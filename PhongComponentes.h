@@ -15,13 +15,16 @@ const double infinito = std::numeric_limits<double>::infinity();
 class phongComponentes{
     public:
         phongComponentes() {}
-        phongComponentes(double ka, double kd, double ks, double n) {
+        phongComponentes(double ka, double kd, double ks, double n, double kr, double kt, double n1, double n2) {
             
             this->ka = min(ka, 1.0);
             this->kd = min(kd, 1.0);
             this->ks = min(ks, 1.0);
             this->n = n;
-            
+            this->kr = min(kr, 1.0);
+            this->kt = min(kt, 1.0);
+            this->n1 = n1;
+            this->n2 = n2;
         }
 
         // as constantes variam de 0 a 1
@@ -29,6 +32,11 @@ class phongComponentes{
         double kd; // difusa -> fosco
         double ks; // especular -> brilhante
         double n; // expoente especular -> o quanto rugoso é o objeto (quanto maior, mais brilhante)
+        double kr; // reflexão -> o quanto o objeto reflete a luz (espelhado)
+        double kt; // transmissão -> o quanto o objeto transmite a luz (transparente)
+        double n1; // índice de refração do meio 1
+        double n2; // índice de refração do meio 2
+
 };
 
 struct iluminacao
@@ -52,6 +60,23 @@ struct listaLuzes
     
 };
 
+// calcula vetor de reflexão
+vetor<double> calcularReflexao(vetor<double> Normal, vetor<double> L) {
+    return normal(2 * produtoEscalar(Normal, L) * Normal - L);
+}
+
+// calcula vetor de refração
+vetor<double> calcularRefração(vetor<double> Normal, vetor<double> L, double n1, double n2) {
+    double n = n1 / n2;
+    double cosI = -produtoEscalar(Normal, L);
+    double sinT2 = n * n * (1.0 - cosI * cosI);
+    if (sinT2 > 1.0) {
+        return {0, 0, 0};
+    }
+    double cosT = sqrt(1.0 - sinT2);
+    return normal(n * L + (n * cosI - cosT) * Normal);
+}
+
 vetor<double> calcularIluminacaoPhong(
     vetor<double> pontoIntersecao, 
     vetor<double> Normal, 
@@ -59,15 +84,18 @@ vetor<double> calcularIluminacaoPhong(
     iluminacao luz, 
     listaLuzes luzes,
     phongComponentes material,
-    sphere_list esferas) 
+    sphere_list esferas,
+    int profundidade) 
 {
-    // Vetores de direção
-    vetor<double> L = normal(subtracao(luz.posicao, pontoIntersecao)); // Direção da luz
+    Normal = normal(Normal);
+    double diffn = material.n1 / material.n2;
     
     // Inicializar vetor de iluminação resultante
     vetor<double> I = {0, 0, 0};
     vetor<double> ambiente = multiplicacaoPorEscalar(luzes.luzes[0].Ia, material.ka);
     I = I + ambiente;
+
+    // calcula parâmetros da equação de phong
     for (int i = 0; i < luzes.luzes.size(); i++) {
         vetor<double> L = normal(subtracao(luzes.luzes[i].posicao, pontoIntersecao)); // Direção da luz
         vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
@@ -92,8 +120,34 @@ vetor<double> calcularIluminacaoPhong(
         // Acumular iluminação resultante
         I = I + difusa + especular;
     }
-    
-    return I;
+    vector<double> corDaEsfera = {1, 0, 0};
+
+    if (profundidade <= 0) {
+        return multiplicacaoPorEscalar(produtoVetorial(I, vetor<double>{corDaEsfera[0], corDaEsfera[1], corDaEsfera[2]}), 0.3);
+    }
+
+    // Reflexão
+    if (material.kr > 0) {
+        vetor<double> R = calcularReflexao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)));
+        raio<double> raioReflexao(pontoIntersecao, R);
+        hit_record rec;
+        if (esferas.hit(raioReflexao, 0.001, infinito, rec)) {
+            I = I + material.kr * calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+        }
+    }
+
+    // Refração
+    if (material.kt > 0) {
+        vetor<double> R = calcularRefração(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), 1.0, 1.5);
+        raio<double> raioRefração(pontoIntersecao, R);
+        hit_record rec;
+        if (esferas.hit(raioRefração, 0.001, infinito, rec)) {
+            I = I + material.kt * calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+        }
+    }
+
+    return multiplicacaoPorEscalar(produtoVetorial(I, vetor<double>{corDaEsfera[0], corDaEsfera[1], corDaEsfera[2]}), 0.3);
+
 }
    
 #endif
