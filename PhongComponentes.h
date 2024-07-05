@@ -127,25 +127,29 @@ vetor<double> calcularIluminacaoPhong(
     }
 
     // Reflexão
+    vetor<double> corReflexao = {0, 0, 0};
     if (material.kr > 0) {
         vetor<double> R = calcularReflexao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)));
         raio<double> raioReflexao(pontoIntersecao, R);
         hit_record rec;
         if (esferas.hit(raioReflexao, 0.001, infinito, rec)) {
-            I = I + material.kr * calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+            corReflexao = calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
         }
+        corReflexao = multiplicacaoPorEscalar(corReflexao, material.kr);
     }
 
     // Refração
+    vetor<double> corRefração = {0, 0, 0};
     if (material.kt > 0) {
-        vetor<double> R = calcularRefração(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), 1.0, 1.5);
+        vetor<double> R = calcularRefração(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), material.n1, material.n2);
         raio<double> raioRefração(pontoIntersecao, R);
         hit_record rec;
         if (esferas.hit(raioRefração, 0.001, infinito, rec)) {
-            I = I + material.kt * calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
+            corRefração = calcularIluminacaoPhong(rec.p, rec.normal, posicaoObservador, luz, luzes, material, esferas, profundidade - 1);
         }
+        corRefração = multiplicacaoPorEscalar(corRefração, material.kt);
     }
-
+    I = I + corReflexao + corRefração;
     return multiplicacaoPorEscalar(produtoVetorial(I, vetor<double>{corDaEsfera[0], corDaEsfera[1], corDaEsfera[2]}), 0.3);
 
 }

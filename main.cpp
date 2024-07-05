@@ -254,8 +254,7 @@ int main() {
     luzes.addLuz(luz2);
 
     // phongComponentes material(0.1, 0.4, 0.9, 10.0);
-    phongComponentes material(0.1, 0.9, 0.0, 10.0, 0.0, 0.9, 1.0, 2.0);
-    double diffn = material.n1 / material.n2;
+    phongComponentes material(0.1, 0.9, 0.0, 10.0, 0.9, 0.0, 1.0, 1.5);
 
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
