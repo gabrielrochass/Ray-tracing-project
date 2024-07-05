@@ -49,7 +49,7 @@ bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mun
     return false;
 }
 
-vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material) {
+vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
     hit_record rec;
 
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
@@ -69,7 +69,7 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
             //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
             //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
             // }
-            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas, 2);
+            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
         }
         return corFinal;
 
@@ -80,15 +80,14 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         for (int i = 0; i < luzes.luzes.size(); i++) {
             // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
             //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.7, luzes.acessarLuz(i).Ia);
+            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
             // } else {
-            //     // Adiciona a contribuição da cor do plano se não estiver na sombra
-            //     corFinal = corFinal + vetor<double>(1, 1, 0);
+            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
+            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
             // }
-            corFinal = corFinal + vetor<double>(1, 1, 0);
+            corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, esferas, 2);
         }
         return corFinal;
-
     } else if (mundo.hit(raio, 0, infinity, rec)) {
         vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
         return color;
@@ -133,8 +132,8 @@ int main() {
     sphere_list esferas;
     
     esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera verde
-    esferas.add(sphere(vetor<double>{1, 0.5, -1}, 0.3, vetor<double>{0, 1, 0})); // Esfera azul
-    esferas.add(sphere(vetor<double>{-1, -0.5, -1}, 0.3, vetor<double>{0, 0, 1})); // Esfera vermelha
+    // esferas.add(sphere(vetor<double>{1, 0.5, -1}, 0.3, vetor<double>{0, 1, 0})); // Esfera azul
+    // esferas.add(sphere(vetor<double>{-1, -0.5, -1}, 0.3, vetor<double>{0, 0, 1})); // Esfera vermelha
     esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
     esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
     
@@ -180,7 +179,7 @@ int main() {
     // Define a iluminação e o material
     iluminacao luz{
         vetor<double>(0.5, -0.5, -0.1), // posição da luz -> diagonal direita superior
-        vetor<double>(0.1, 0.1, 0.1), // intensidade ambiente
+        vetor<double>(0.8, 0.8, 0.8), // intensidade ambiente
         vetor<double>(0.7, 0.7, 0.7), // intensidade difusa
         vetor<double>(0.5, 0.5, 0.5)  // intensidade especular
     };
@@ -204,6 +203,16 @@ int main() {
                                 10.0, // n
                                 1.0, // kr
                                 0.5, // kt
+                                1.0, // n1
+                                10.5 // n2
+                                );
+    phongComponentes materialEsferas(  
+                                0.1, // ka
+                                0.3, // kd
+                                0.9, // ks
+                                10.0, // n
+                                0, // kr
+                                1, // kt
                                 1.0, // n1
                                 10.5 // n2
                                 );
@@ -232,7 +241,7 @@ int main() {
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material);
+            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
             image[j][i] = color;
         }
     }
