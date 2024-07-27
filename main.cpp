@@ -62,13 +62,6 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         vetor<double> N = vetorUni(rec.normal);
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-            //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            // } else {
-            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            // }
             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
         }
         return corFinal;
@@ -78,14 +71,8 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         vetor<double> N = vetorUni(rec.normal);
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-            //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            // } else {
-            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            // }
             corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, esferas, 2);
+            
         }
         return corFinal;
     } else if (mundo.hit(raio, 0, infinity, rec)) {
@@ -106,7 +93,7 @@ int main() {
 
   
     // define a câmera
-    vetor<double> posicaoDaCamera(0, 0, 0);
+    vetor<double> posicaoDaCamera(0, 0, 1); 
     vetor<double> mira(0, 0, -1);
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
@@ -166,7 +153,7 @@ int main() {
                                 0.3, // kd
                                 0.9, // ks
                                 10.0, // n
-                                0, // kr
+                                1, // kr
                                 1, // kt
                                 1.0, // n1
                                 10.5 // n2
