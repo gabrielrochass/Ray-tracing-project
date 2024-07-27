@@ -27,6 +27,7 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
+// define se um objeto tá na sombra
 bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
     for (int i = 0; i < luzes.luzes.size(); i++) {
         vetor<double> luzPos = luzes.acessarLuz(i).posicao;
@@ -48,12 +49,12 @@ bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mun
     return false;
 }
 
+// calcula a cor de um pixel com base na iluminação Phong
 vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material) {
     hit_record rec;
 
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
 
-    // Variável para armazenar a cor final do pixel
     vetor<double> corFinal = {0.0, 0.0, 0.0};
 
     if (esferas.hit(raio, 0, infinity, rec)) {
@@ -185,7 +186,6 @@ int main() {
     luzes.addLuz(luz2);
 
     phongComponentes material(0.1, 0.4, 0.9, 10.0, 0.5, 0.5, 1.0, 1.0);
-    //phongComponentes materialDifusa(0.1, 0.9, 0.0, 10.0, 0.5, 0.5, 1.0, 1.0);
     phongComponentes materialDifusa(0.1, 0.5, 0.5, 10, 0.5, 0.5, 1.0, 1.5);
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
@@ -226,20 +226,3 @@ int main() {
     
     return 0;
 }
-
-// Adicione triângulos à malha
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
-    // mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
-
-    // adiciona esferas ao mundo
-    // esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
-
-
- // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
-
-    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));

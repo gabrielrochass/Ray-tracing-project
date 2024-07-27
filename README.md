@@ -12,3 +12,24 @@ Tenha em mente que toda vez que nos referimos a ***pontos ou vetores*** nessa es
 
 ## Links importantes
 - Especificação (Notion): https://short-crustacean-7e9.notion.site/71c2663a94304d629d33a8f289a7017e?v=96ba08a6ebe647e3aa5339ea8e019f3b
+
+## Sobre o Octree
+- Octree é uma estrutura de dados hierárquica que divide uma região 3D em sub-volumes menores. Cada cubo grande tem até 8 filhos (octantes) e tudo isso pode ser representado por uma tree. 
+- A divisão pode ocorrer de forma recursiva
+
+*Benefícios*
+1. Eficiência na intersecção
+2. Hierarquia no espaço
+3. Divisão recursiva
+
+> O maior benefício, no entanto, é reduzir o número de iterações feitas e checks pra saber se um objeto é atingido por um raio ou não. Com Octree, você só testa os raios que atravessam o objeto em determinado cubo (sub-volume)
+
+*Construção da Octree:*
+1. A Octree é construída a partir da cena, começando com um nó raiz que engloba toda a cena.
+2. Se o número de objetos em um nó excede um limite, o nó é subdividido em oito filhos, cada um representando uma parte do espaço do nó pai.
+3. Objetos são distribuídos nos filhos de acordo com sua posição.
+
+*Interseção com Raio:*
+1. Para determinar a interseção de um raio com objetos na cena, começamos pelo nó raiz.
+2. Verificamos quais filhos do nó raiz são atravessados pelo raio e repetimos o processo recursivamente para esses filhos.
+4. Testamos a interseção do raio apenas com objetos nos nós folhas que o raio atravessa.
