@@ -25,7 +25,6 @@ using namespace std;
 
 // integrar com raioColor
 
-
 struct BoundingBox {
     vetor<double> min, max;
     BoundingBox() {}
@@ -46,6 +45,7 @@ struct OctreeNode {
     void subdivide();
     void inserirEsfera(shared_ptr<sphere> esfera);
     bool intersectou(const raio<double>& r, double t_min, double t_max, hit_record& rec) const;
+    bool intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const;
 };
 
 void OctreeNode::subdivide() {
@@ -90,4 +90,44 @@ void OctreeNode::inserirEsfera(shared_ptr<sphere> esfera) {
             }
         }
     }
+}
+
+bool OctreeNode::intersectou(const raio<double>& r, double t_min, double t_max, hit_record& rec) const {
+    if (!intersectouBox(box, r, t_min, t_max)) return false;
+
+    bool acertouAlguem = false;
+    double maisPerto = t_max;
+
+    if (ehFolha()) {
+        for (auto& esfera : esferas) {
+            hit_record temp_rec;
+            if (esfera->hit(r, t_min, maisPerto, temp_rec)) {
+                acertouAlguem = true;
+                maisPerto = temp_rec.t;
+                rec = temp_rec;
+            }
+        }
+    } else {
+        for (auto& filho : filhos) {
+            hit_record temp_rec;
+            if (filho->intersectou(r, t_min, maisPerto, temp_rec)) {
+                acertouAlguem = true;
+                maisPerto = temp_rec.t;
+                rec = temp_rec;
+            }
+        }
+    }
+
+    return acertouAlguem;
+}
+
+bool OctreeNode::intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const {
+    vetor<double> invD = {1.0 / r.direcao.x, 1.0 / r.direcao.y, 1.0 / r.direcao.z};
+    vetor<double> t0 = produtoVetorial(subtracao(box.min, r.origem), invD);
+    vetor<double> t1 = produtoVetorial(subtracao(box.max, r.origem), invD);
+    vetor<double> tmin = {min(t0.x, t1.x), min(t0.y, t1.y), min(t0.z, t1.z)};
+    vetor<double> tmax = {max(t0.x, t1.x), max(t0.y, t1.y), max(t0.z, t1.z)};
+    double tminMax = max(tmin.x, max(tmin.y, tmin.z));
+    double tmaxMin = min(tmax.x, min(tmax.y, tmax.z));
+    return tminMax <= tmaxMin;
 }
