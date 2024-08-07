@@ -17,6 +17,9 @@ class sphere_list{
         void add(sphere l) {list.push_back(l);}
 
         bool hit(const raio<double>& raio, double t_min, double t_max, hit_record& rec) const;
+
+        // retorna as esferas da lista
+        vector<sphere> getEsferas() const {return list;}
     public:
         vector<sphere> list;
 };

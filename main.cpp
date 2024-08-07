@@ -14,7 +14,7 @@
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
-#include "octree.cpp" // Include the header file for OctreeNode
+#include "octree.cpp" 
 
 using namespace std;
 
@@ -63,15 +63,16 @@ vetor<double> raioColor(const raio<double>& raio, const OctreeNode& octree, cons
             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, octree, plano1, 1);
         }
         return corFinal;
-    } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, octree, 2);
-        }
-        return corFinal;
     }
+    // } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
+    //     vetor<double> p = raioAt(raio, rec.t);
+    //     vetor<double> N = vetorUni(rec.normal);
+
+    //     for (int i = 0; i < luzes.luzes.size(); i++) {
+    //         corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, octree, 2);
+    //     }
+    //     return corFinal;
+    // }
 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     return backgroundColor(direcao_uni);
@@ -89,19 +90,6 @@ int main() {
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
 
-    double angulo = 3.14 / 4; 
-    // define a rotação eixo Z
-    matriz4x4 rotacaoZ = matriz4x4::createRotationZ(angulo,false);
-
-    // define a rotação eixo X
-    matriz4x4 rotacaoX = matriz4x4::createRotationX(angulo,false);
-
-    // translação para a direita
-    matriz4x4 trans = matriz4x4::createTranslation(-0.5, 0, 0);
-
-    // define a rotação eixo Y
-    matriz4x4 rotacaoY = matriz4x4::createRotationY(angulo,false);
-
     // define o mundo
     malha mundo;
     sphere_list esferas;
@@ -112,7 +100,9 @@ int main() {
 
     // Cria o octree e adiciona as esferas
     OctreeNode octree(BoundingBox(vetor<double>{-1, -1, -1}, vetor<double>{1, 1, 1}));
-    octree.inserirEsfera(make_shared<sphere>(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0}));
+    for (const auto& esfera : esferas.getEsferas()) {
+        octree.inserirEsfera(make_shared<sphere>(esfera));
+    }
 
     // Define a iluminação e o material
     iluminacao luz{
