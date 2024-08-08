@@ -62,6 +62,12 @@ vetor<T> multiplicacaoPorEscalar(const vetor<T>& v, T escalar) {
     return vetor<T>(v.x * escalar, v.y * escalar, v.z * escalar);
 }
 
+// Função para multiplicar um vetor por um escalar
+vetor<double> multiplicacaoPorEscalar2(const vetor<double>& v, double escalar) {
+    return vetor<double>(v.x * escalar, v.y * escalar, v.z * escalar);
+}
+
+
 template<typename T>
 bool operator==(const vetor<T>& v1, const vetor<T>& v2) {
     return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;

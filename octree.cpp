@@ -7,6 +7,7 @@
 #include <limits>
 #include "raio.h"
 #include "sphere.h"
+#include "vector.h"
 
 // Define a estrutura do BoundingBox
 struct BoundingBox {
@@ -33,6 +34,7 @@ struct OctreeNode {
     bool intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const;
 };
 
+
 void OctreeNode::subdivide() {
     vetor<double> mid = multiplicacaoPorEscalar(soma(box.min, box.max), 0.5);
     vetor<double> min = box.min;
@@ -49,9 +51,7 @@ void OctreeNode::subdivide() {
 
     for (auto& esfera : esferas) {
         for (auto& filho : filhos) {
-            if (filho->box.min.x <= esfera->center.x && esfera->center.x <= filho->box.max.x &&
-                filho->box.min.y <= esfera->center.y && esfera->center.y <= filho->box.max.y &&
-                filho->box.min.z <= esfera->center.z && esfera->center.z <= filho->box.max.z) {
+            if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, std::numeric_limits<double>::max())) {
                 filho->inserirEsfera(esfera);
             }
         }
@@ -68,9 +68,7 @@ void OctreeNode::inserirEsfera(std::shared_ptr<sphere> esfera) {
         }
     } else {
         for (auto& filho : filhos) {
-            if (filho->box.min.x <= esfera->center.x && esfera->center.x <= filho->box.max.x &&
-                filho->box.min.y <= esfera->center.y && esfera->center.y <= filho->box.max.y &&
-                filho->box.min.z <= esfera->center.z && esfera->center.z <= filho->box.max.z) {
+            if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, std::numeric_limits<double>::max())) {
                 filho->inserirEsfera(esfera);
             }
         }
@@ -106,15 +104,19 @@ bool OctreeNode::intersectou(const raio<double>& r, double t_min, double t_max, 
     return acertouAlguem;
 }
 
+vetor<double> multiplicacaoPorComponente(const vetor<double>& a, const vetor<double>& b) {
+    return vetor<double>(a.x * b.x, a.y * b.y, a.z * b.z);
+}
+
 bool OctreeNode::intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const {
     vetor<double> invD = {1.0 / r.direcao.x, 1.0 / r.direcao.y, 1.0 / r.direcao.z};
-    vetor<double> t0 = produtoVetorial(subtracao(box.min, r.origem), invD);
-    vetor<double> t1 = produtoVetorial(subtracao(box.max, r.origem), invD);
+    vetor<double> t0 = multiplicacaoPorComponente(subtracao(box.min, r.origem), invD);
+    vetor<double> t1 = multiplicacaoPorComponente(subtracao(box.max, r.origem), invD);
     vetor<double> tmin = {std::min(t0.x, t1.x), std::min(t0.y, t1.y), std::min(t0.z, t1.z)};
     vetor<double> tmax = {std::max(t0.x, t1.x), std::max(t0.y, t1.y), std::max(t0.z, t1.z)};
     double tminMax = std::max(tmin.x, std::max(tmin.y, tmin.z));
     double tmaxMin = std::min(tmax.x, std::min(tmax.y, tmax.z));
-    return tminMax <= tmaxMin;
+    return tminMax <= tmaxMin && tmaxMin >= t_min && tminMax <= t_max;
 }
 
 #endif // OCTREE_H

@@ -28,55 +28,29 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-// verifica se o ponto está em sombra
-bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const OctreeNode& octree, const plano& plano1) {
-    for (int i = 0; i < luzes.luzes.size(); i++) {
-        vetor<double> luzPos = luzes.acessarLuz(i).posicao;
-        raio<double> r(ponto, subtracao(luzPos, ponto));
-        hit_record rec;
-
-        // Verifica se há interseção com a octree ou plano
-        bool intersecionouOctree = octree.intersectou(r, 0.001, infinity, rec);
-        bool intersecionouPlano = plano1.hitPlano(r, 0.001, infinity, rec);
-
-        // Se houver interseção com qualquer objeto, o ponto está na sombra para esta luz
-        if (intersecionouOctree || intersecionouPlano) {
-            return true;
-        }
-    }
-
-    // Se nenhuma luz estiver obstruída, o ponto não está na sombra
-    return false;
-}
-
 // raio color com octree
 vetor<double> raioColor(const raio<double>& raio, const OctreeNode& octree, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
     hit_record rec;
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
     vetor<double> corFinal = {0.0, 0.0, 0.0};
 
+    // Verifica se há interseção com a octree
     if (octree.intersectou(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
 
+        // Adiciona a iluminação Phong para cada luz
         for (int i = 0; i < luzes.luzes.size(); i++) {
             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, octree, plano1, 1);
         }
         return corFinal;
     }
-    // } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-    //     vetor<double> p = raioAt(raio, rec.t);
-    //     vetor<double> N = vetorUni(rec.normal);
 
-    //     for (int i = 0; i < luzes.luzes.size(); i++) {
-    //         corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, octree, 2);
-    //     }
-    //     return corFinal;
-    // }
-
+    // Se não houver interseção com a octree, retorna a cor de fundo
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     return backgroundColor(direcao_uni);
 }
+
 
 int main() {
     // define a imagem
