@@ -9,6 +9,8 @@
 #include "sphere.h"
 #include "vector.h"
 
+using namespace std;
+
 // Define a estrutura do BoundingBox
 struct BoundingBox {
     vetor<double> min, max;
@@ -19,8 +21,8 @@ struct BoundingBox {
 // Define a estrutura do OctreeNode
 struct OctreeNode {
     BoundingBox box;
-    std::vector<std::shared_ptr<OctreeNode>> filhos;
-    std::vector<std::shared_ptr<sphere>> esferas;
+    vector<shared_ptr<OctreeNode>> filhos;
+    vector<shared_ptr<sphere>> esferas;
 
     OctreeNode(const BoundingBox& box_) : box(box_) {}
 
@@ -29,29 +31,29 @@ struct OctreeNode {
     }
 
     void subdivide();
-    void inserirEsfera(std::shared_ptr<sphere> esfera);
+    void inserirEsfera(shared_ptr<sphere> esfera);
     bool intersectou(const raio<double>& r, double t_min, double t_max, hit_record& rec) const;
     bool intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const;
 };
 
 
 void OctreeNode::subdivide() {
-    vetor<double> mid = multiplicacaoPorEscalar(soma(box.min, box.max), 0.5);
     vetor<double> min = box.min;
     vetor<double> max = box.max;
+    vetor<double> mid = multiplicacaoPorEscalar(soma(min, max), 0.5);
 
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(min, mid)));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, min.y, min.z), vetor<double>(max.x, mid.y, mid.z))));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, mid.y, min.z), vetor<double>(max.x, max.y, mid.z))));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, mid.y, min.z), vetor<double>(mid.x, max.y, mid.z))));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, min.y, mid.z), vetor<double>(mid.x, mid.y, max.z))));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, min.y, mid.z), vetor<double>(max.x, mid.y, max.z))));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(mid, max)));
-    filhos.push_back(std::make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, mid.y, mid.z), vetor<double>(mid.x, max.y, max.z))));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(min, mid)));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, min.y, min.z), vetor<double>(max.x, mid.y, mid.z))));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, mid.y, min.z), vetor<double>(max.x, max.y, mid.z))));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, mid.y, min.z), vetor<double>(mid.x, max.y, mid.z))));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, min.y, mid.z), vetor<double>(mid.x, mid.y, max.z))));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, min.y, mid.z), vetor<double>(max.x, mid.y, max.z))));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(mid, max)));
+    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, mid.y, mid.z), vetor<double>(mid.x, max.y, max.z))));
 
     for (auto& esfera : esferas) {
         for (auto& filho : filhos) {
-            if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, std::numeric_limits<double>::max())) {
+            if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, numeric_limits<double>::max())) {
                 filho->inserirEsfera(esfera);
             }
         }
@@ -60,7 +62,7 @@ void OctreeNode::subdivide() {
     esferas.clear();
 }
 
-void OctreeNode::inserirEsfera(std::shared_ptr<sphere> esfera) {
+void OctreeNode::inserirEsfera(shared_ptr<sphere> esfera) {
     if (filhos.empty()) {
         esferas.push_back(esfera);
         if (esferas.size() > 8) {
@@ -68,7 +70,7 @@ void OctreeNode::inserirEsfera(std::shared_ptr<sphere> esfera) {
         }
     } else {
         for (auto& filho : filhos) {
-            if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, std::numeric_limits<double>::max())) {
+            if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, numeric_limits<double>::max())) {
                 filho->inserirEsfera(esfera);
             }
         }
@@ -112,11 +114,11 @@ bool OctreeNode::intersectouBox(const BoundingBox& box, const raio<double>& r, d
     vetor<double> invD = {1.0 / r.direcao.x, 1.0 / r.direcao.y, 1.0 / r.direcao.z};
     vetor<double> t0 = multiplicacaoPorComponente(subtracao(box.min, r.origem), invD);
     vetor<double> t1 = multiplicacaoPorComponente(subtracao(box.max, r.origem), invD);
-    vetor<double> tmin = {std::min(t0.x, t1.x), std::min(t0.y, t1.y), std::min(t0.z, t1.z)};
-    vetor<double> tmax = {std::max(t0.x, t1.x), std::max(t0.y, t1.y), std::max(t0.z, t1.z)};
-    double tminMax = std::max(tmin.x, std::max(tmin.y, tmin.z));
-    double tmaxMin = std::min(tmax.x, std::min(tmax.y, tmax.z));
-    return tminMax <= tmaxMin && tmaxMin >= t_min && tminMax <= t_max;
+    vetor<double> tmin = {min(t0.x, t1.x), min(t0.y, t1.y), min(t0.z, t1.z)};
+    vetor<double> tmax = {max(t0.x, t1.x), max(t0.y, t1.y), max(t0.z, t1.z)};
+    double tminMax = max(tmin.x, max(tmin.y, tmin.z));
+    double tmaxMin = min(tmax.x, min(tmax.y, tmax.z));
+    return (tminMax <= tmaxMin) && (tmaxMin >= t_min) && (tminMax <= t_max);
 }
 
-#endif // OCTREE_H
+#endif
