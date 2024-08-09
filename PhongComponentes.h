@@ -3,6 +3,7 @@
 
 #include "vector.h"
 #include "raio.h"
+#include "cone.h"
 #include <vector>
 #include <algorithm>
 #include <limits>
@@ -67,15 +68,7 @@ vetor<double> calcularReflexao(vetor<double> Normal, vetor<double> L) {
 
 // calcula vetor de refração
 vetor<double> calcularRefracao(const vetor<double>& V, const vetor<double>& N, double ni, double nt) {
-    /*double eta = ni / nt;
-    double cosi = -produtoEscalar(N, I);
-    double sint2 = eta * eta * (1 - cosi * cosi);
-    if (sint2 > 1) {
-        // Reflexão total interna
-        return calcularReflexao(N, I);
-    }
-    double cost = sqrt(1 - sint2);
-    return eta * I + (eta * cosi - cost) * N;*/
+   
     double cosO = produtoEscalar(N, V);
     double eta = ni / nt;
     double constante = 1 - eta * eta * (1 - cosO * cosO);
@@ -95,6 +88,7 @@ vetor<double> calcularIluminacaoPhong(
     phongComponentes material,
     sphere_list esferas,
     plano plano,
+    cone_list cones,
     int profundidade) 
 {
     Normal = normal(Normal);
@@ -111,21 +105,7 @@ vetor<double> calcularIluminacaoPhong(
         vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
         vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L); // Reflexão da luz
         
-        // raio<double> raioSombra(pontoIntersecao, L);
-        // bool emSombra = false;
-        // hit_record temp_rec;
-        // if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
-        //     emSombra = true;
-        // }
-
-        // // Componentes de iluminação
-        // vetor<double> difusa = {0, 0, 0};
-        // vetor<double> especular = {0, 0, 0};
-
-        // if (!emSombra) {
-        //     difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
-        //     especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
-        // }
+        
 
         //Componentes de iluminação
         vetor<double> difusa = {0, 0, 0};
@@ -158,7 +138,7 @@ vetor<double> calcularIluminacaoPhong(
         raio<double> raioReflexao(pontoIntersecao, R);
         hit_record recReflexao;
         if (esferas.hit(raioReflexao, 0.001, infinito, recReflexao)) {
-            corReflexao = calcularIluminacaoPhong(recReflexao.p, recReflexao.normal, posicaoObservador, luz, luzes, material, esferas,plano, profundidade - 1);
+            corReflexao = calcularIluminacaoPhong(recReflexao.p, recReflexao.normal, posicaoObservador, luz, luzes, material, esferas,plano, cones, profundidade - 1);
             corDaEsfera = produtoVetorial(corReflexao, recReflexao.cor);
         }
         corReflexao = multiplicacaoPorEscalar(corReflexao, material.kr);
@@ -173,7 +153,7 @@ vetor<double> calcularIluminacaoPhong(
         raio<double> raioRefracao(pontoIntersecao, R);
         hit_record recRefracao;
         if (esferas.hit(raioRefracao, 0.001, infinito, recRefracao)) {
-            corRefracao = calcularIluminacaoPhong(recRefracao.p, recRefracao.normal, posicaoObservador, luz, luzes, material, esferas,plano, profundidade - 1);
+            corRefracao = calcularIluminacaoPhong(recRefracao.p, recRefracao.normal, posicaoObservador, luz, luzes, material, esferas,plano, cones, profundidade - 1);
             corRefracao = produtoVetorial(corRefracao, recRefracao.cor);
         }
         corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
@@ -181,10 +161,242 @@ vetor<double> calcularIluminacaoPhong(
 
    
     I = I + corReflexao + corRefracao;
+
+    // Clamping final
+    I.x = fmax(0.0, fmin(1.0, I.x));
+    I.y = fmax(0.0, fmin(1.0, I.y));
+    I.z = fmax(0.0, fmin(1.0, I.z));
+
     return multiplicacaoPorEscalar(produtoVetorial(I, corDaEsfera), 0.8);
     
 
 }
+
+vetor<double> calcularIluminacaoPhongCilindro(
+    vetor<double> pontoIntersecao,
+    vetor<double> Normal,
+    vetor<double> posicaoObservador,
+    iluminacao luz,
+    listaLuzes luzes,
+    phongComponentes material,
+    sphere_list esferas,
+    cylinder_list cilindros,
+    plano plano,
+    int profundidade)
+{
+    Normal = normal(Normal);
+    double diffn = material.n1 / material.n2;
+
+    // Inicializar vetor de iluminação resultante
+    vetor<double> I = {0, 0, 0};
+    vetor<double> ambiente = multiplicacaoPorEscalar(luzes.luzes[0].Ia, material.ka);
+    I = I + ambiente;
+
+    // Calcula parâmetros da equação de Phong
+    for (int i = 0; i < luzes.luzes.size(); i++) {
+        vetor<double> L = normal(subtracao(luzes.luzes[i].posicao, pontoIntersecao)); // Direção da luz
+        vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
+        vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L); // Reflexão da luz
+
+        
+        vetor<double> difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
+        
+        
+        vetor<double> especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
+
+        // Acumular iluminação resultante
+        I = I + difusa + especular;
+    }
+
+    vetor<double> corDoCilindro = {0.5, 0.5, 1}; // cor padrão do cilindro, você pode atualizar isso conforme necessário
+    hit_record rec;
+
+    for (const auto& c : cilindros.list) {
+        if (c.hit(raio<double>(pontoIntersecao, normal(subtracao(pontoIntersecao, posicaoObservador))), 0.001, infinito, rec)) {
+            corDoCilindro = rec.cor;
+        }
+    }
+
+    if(profundidade <= 0) {
+        return multiplicacaoPorEscalar(produtoVetorial(I, corDoCilindro), 0.8);
+    }
+
+    // Reflexão
+    if (material.kr > 0 && profundidade > 0) {
+        vetor<double> R = calcularReflexao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)));
+        raio<double> refletido(pontoIntersecao, R);
+        hit_record recReflexao;
+        if (cilindros.hit(refletido, 0.001, infinito, recReflexao)) {
+            I = I + multiplicacaoPorEscalar(calcularIluminacaoPhongCilindro(recReflexao.p, recReflexao.normal, posicaoObservador, luz, luzes, material, esferas, cilindros, plano, profundidade - 1), material.kr);
+        }
+    }
+
+    // Refração
+    if (material.kt > 0 && profundidade > 0) {
+        vetor<double> T = calcularRefracao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), material.n1, material.n2);
+        raio<double> transmitido(pontoIntersecao, T);
+        hit_record recRefracao;
+        if (cilindros.hit(transmitido, 0.001, infinito, recRefracao)) {
+            I = I + multiplicacaoPorEscalar(calcularIluminacaoPhongCilindro(recRefracao.p, recRefracao.normal, posicaoObservador, luz, luzes, material, esferas, cilindros, plano, profundidade - 1), material.kt);
+        }
+    }
+
+    // Clamping final
+    I.x = fmax(0.0, fmin(1.0, I.x));
+    I.y = fmax(0.0, fmin(1.0, I.y));
+    I.z = fmax(0.0, fmin(1.0, I.z));
+
+    return I;
+
+    
+}
+
+/*vetor<double> calcularIluminacaoPhongCone(
+    vetor<double> pontoIntersecao,
+    vetor<double> Normal,
+    vetor<double> posicaoObservador,
+    listaLuzes luzes,
+    phongComponentes material,
+    sphere_list esferas,
+    cone_list cones,
+    plano plano,
+    int profundidade)
+{
+    Normal = normal(Normal);
+    double diffn = material.n1 / material.n2;
+
+    // Inicializar vetor de iluminação resultante
+    vetor<double> I = {0, 0, 0};
+    vetor<double> ambiente = multiplicacaoPorEscalar(luzes.luzes[0].Ia, material.ka);
+    I = I + ambiente;
+
+    // Calcula parâmetros da equação de Phong
+    for (int i = 0; i < luzes.luzes.size(); i++) {
+        vetor<double> L = normal(subtracao(luzes.luzes[i].posicao, pontoIntersecao)); // Direção da luz
+        vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
+        vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L); // Reflexão da luz
+
+        
+        vetor<double> difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
+        
+        
+        vetor<double> especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
+
+        // Acumular iluminação resultante
+        I = I + difusa + especular;
+    }
+
+    vetor<double> corDoCone = {0.5, 0.5, 1}; // cor padrão do cone, você pode atualizar isso conforme necessário
+    
+
+    hit_record rec;
+
+    for (const auto& c : cones.list) {
+        if (c.hit(raio<double>(pontoIntersecao, normal(subtracao(pontoIntersecao, posicaoObservador))), 0.001, infinito, rec)) {
+            corDoCone = rec.cor;
+        }
+    }
+
+    if (profundidade <= 0) {
+        return multiplicacaoPorEscalar(produtoVetorial(I, corDoCone), 0.8);
+    }
+
+    // Reflexão
+    vetor<double> corReflexao = {0, 0, 0};
+    if (material.kr > 0) {
+        vetor<double> R = calcularReflexao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)));
+        raio<double> refletido(pontoIntersecao, R);
+        hit_record recReflexao;
+        if (cones.hit(refletido, 0.001, infinito, recReflexao)) {
+            corReflexao = calcularIluminacaoPhongCone(recReflexao.p, recReflexao.normal, posicaoObservador, luzes, material, esferas, cones, plano, profundidade - 1);
+            corDoCone = produtoVetorial(corReflexao, recReflexao.cor);
+        }
+        corReflexao = multiplicacaoPorEscalar(corReflexao, material.kr);
+    }
+    // Refração
+    vetor<double> corRefracao = {0, 0, 0};
+    if (material.kt > 0) {
+        vetor<double> T = calcularRefracao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), material.n1, material.n2);
+        raio<double> transmitido(pontoIntersecao, T);
+         hit_record recRefracao;
+        if (cones.hit(transmitido, 0.001, infinito, recRefracao)) {
+            corRefracao = calcularIluminacaoPhongCone(recRefracao.p, recRefracao.normal, posicaoObservador, luzes, material, esferas, cones, plano, profundidade - 1);
+            corRefracao = produtoVetorial(corRefracao, recRefracao.cor);
+        }
+        corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
+    }
+
+    I = I + corReflexao + corRefracao;
+    return  multiplicacaoPorEscalar(produtoVetorial(I, corDoCone), 0.8);
+}*/
+
+vetor<double> calcularIluminacaoPhongCone(
+    vetor<double> pontoIntersecao,
+    vetor<double> Normal,
+    vetor<double> posicaoObservador,
+    iluminacao luz,
+    listaLuzes luzes,
+    phongComponentes material,
+    sphere_list esferas,
+    cone_list cones,
+    plano plano,
+    int profundidade)
+{
+    Normal = normal(Normal);
+    vetor<double> I = {0, 0, 0};
+
+    // Componente ambiente
+    vetor<double> ambiente = multiplicacaoPorEscalar(luzes.luzes[0].Ia, material.ka);
+    I = I + ambiente;
+
+    // Componentes difusa e especular
+    for (int i = 0; i < luzes.luzes.size(); i++) {
+        vetor<double> L = normal(subtracao(luzes.luzes[i].posicao, pontoIntersecao));
+        vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao));
+        vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L);
+
+        double cosNL = fmax(0.0, produtoEscalar(Normal, L));
+        double cosRV = fmax(0.0, produtoEscalar(R, V));
+
+        vetor<double> difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, cosNL * material.kd);
+        vetor<double> especular = multiplicacaoPorEscalar(luzes.luzes[i].Is, pow(cosRV, material.n) * material.ks);
+
+        I = I + difusa + especular;
+    }
+
+    if(profundidade <= 0) {
+        return I;
+    }
+
+    // Reflexão
+    if (material.kr > 0 && profundidade > 0) {
+        vetor<double> R = calcularReflexao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)));
+        raio<double> refletido(pontoIntersecao, R);
+        hit_record recReflexao;
+        if (cones.hit(refletido, 0.001, infinito, recReflexao)) {
+            I = I + multiplicacaoPorEscalar(calcularIluminacaoPhongCone(recReflexao.p, recReflexao.normal, posicaoObservador, luz, luzes, material, esferas, cones, plano, profundidade - 1), material.kr);
+        }
+    }
+
+    // Refração
+    if (material.kt > 0 && profundidade > 0) {
+        vetor<double> T = calcularRefracao(Normal, normal(subtracao(posicaoObservador, pontoIntersecao)), material.n1, material.n2);
+        raio<double> transmitido(pontoIntersecao, T);
+        hit_record recRefracao;
+        if (cones.hit(transmitido, 0.001, infinito, recRefracao)) {
+            I = I + multiplicacaoPorEscalar(calcularIluminacaoPhongCone(recRefracao.p, recRefracao.normal, posicaoObservador, luz, luzes, material, esferas, cones, plano, profundidade - 1), material.kt);
+        }
+    }
+
+    // Clamping final
+    I.x = fmax(0.0, fmin(1.0, I.x));
+    I.y = fmax(0.0, fmin(1.0, I.y));
+    I.z = fmax(0.0, fmin(1.0, I.z));
+
+    return I;
+}
+
+
 
 vetor<double> calcularIluminacaoPhongPlano(
     vetor<double> pontoIntersecao, 
@@ -211,21 +423,7 @@ vetor<double> calcularIluminacaoPhongPlano(
         vetor<double> V = normal(subtracao(posicaoObservador, pontoIntersecao)); // Direção para o observador
         vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L); // Reflexão da luz
         
-        // raio<double> raioSombra(pontoIntersecao, L);
-        // bool emSombra = false;
-        // hit_record temp_rec;
-        // if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
-        //     emSombra = true;
-        // }
-
-        // // Componentes de iluminação
-        // vetor<double> difusa = {0, 0, 0};
-        // vetor<double> especular = {0, 0, 0};
-
-        // if (!emSombra) {
-        //     difusa = multiplicacaoPorEscalar(luzes.luzes[i].Id, (produtoEscalar(Normal, L) * material.kd));
-        //     especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luzes.luzes[i].Is, material.ks), pow(produtoEscalar(R, V), material.n));
-        // }
+        
 
         //Componentes de iluminação
         vetor<double> difusa = {0, 0, 0};
@@ -275,7 +473,15 @@ vetor<double> calcularIluminacaoPhongPlano(
     }
 
    
+
     I = I + corReflexao + corRefracao;
+
+
+    // Clamping final
+    I.x = fmax(0.0, fmin(1.0, I.x));
+    I.y = fmax(0.0, fmin(1.0, I.y));
+    I.z = fmax(0.0, fmin(1.0, I.z));
+
     return multiplicacaoPorEscalar(produtoVetorial(I, corDoPlano), 0.8);
     
 
