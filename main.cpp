@@ -71,6 +71,9 @@ int main() {
     esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera verde
     esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
     esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
+    esferas.add(sphere(vetor<double>{0, -1, -1}, 0.4, vetor<double>{0.5, 0.5, 0.5})); // Esfera cinza
+    esferas.add(sphere(vetor<double>{0, 1, -1}, 0.4, vetor<double>{1, 0, 1})); // Esfera rosa
+    // esferas.add(sphere(vetor<double>{0, 0, -2}, 0.5, vetor<double>{1, 1, 0})); // Esfera amarela
 
     // Cria o octree e adiciona as esferas
     OctreeNode octree(BoundingBox(vetor<double>{-1, -1, -1}, vetor<double>{1, 1, 1}));
