@@ -14,6 +14,7 @@
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
+#include "toro.h"
 
 using namespace std;
 
@@ -56,7 +57,10 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
     // Variável para armazenar a cor final do pixel
     vetor<double> corFinal = {0.0, 0.0, 0.0};
 
-    if (esferas.hit(raio, 0, infinity, rec)) {
+    if (mundo.hit(raio, 0, infinity, rec)) {
+        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
+        return color;
+    } else if (esferas.hit(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
 
@@ -90,11 +94,7 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
         // return corFinal;
         return vetor<double>{0,0,0.2};
 
-    } else if (mundo.hit(raio, 0, infinity, rec)) {
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
-    }
-
+    } 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
     return backgroundColor(direcao_uni);
 }
@@ -133,9 +133,9 @@ int main() {
     malha mundo;
     sphere_list esferas;
     
-    esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
-    esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.40));
-    esferas.add(sphere(vetor<double>{-1.0, 0.0, -1}, 0.35));
+    // esferas.add(sphere(vetor<double>{0.0, 0.0, -1}, 0.50));
+    // esferas.add(sphere(vetor<double>{1, 0.0, -1}, 0.40));
+    // esferas.add(sphere(vetor<double>{-1.0, 0.0, -1}, 0.35));
     
     // adiciona triângulos à malha
     // criação dos vértices triângulo 1 rotacionado eixo Z
@@ -162,7 +162,17 @@ int main() {
     vetor<double> v12 = rotacaoY.multMatrizVetor({-1, 0, -1});
     triangulo tri4(v10, v11, v12);
 
-    
+    // Adiciona o toro à malha
+    double R = 0.8; // Raio do círculo do toro
+    double r = 0.1; // Raio do tubo
+    int num_theta = 50; // Número de divisões ao longo do círculo do toro
+    int num_phi = 50;   // Número de divisões ao longo do tubo
+
+    // mundo.add(tri1);
+    // mundo.add(tri2);
+    // mundo.add(tri3);
+    // mundo.add(tri4);
+    mundo = gerarToro(mundo, R, r, num_theta, num_phi);
     
 
     // Define a iluminação e o material
