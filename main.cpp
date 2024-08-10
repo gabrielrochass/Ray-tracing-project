@@ -41,8 +41,8 @@ vetor<double> raioColor(const raio<double>& raio, const OctreeNode& octree, cons
 
         // Adiciona a iluminação Phong para cada luz
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, octree, plano1, 1);
-            // corFinal = corFinal + vetor<double>{0.0, 0.0, 0.8};
+            // corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, octree, plano1, 1);
+            corFinal = corFinal + vetor<double>{0.0, 0.0, 0.8};
         }
         return corFinal;
     }

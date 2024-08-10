@@ -116,11 +116,12 @@ vetor<double> calcularIluminacaoPhong(
         I = soma(I, soma(difusa, especular));
     }
 
-    vetor<double> corDaEsfera = {0, 0, 0};
+    vetor<double> corDaEsfera = {1, 0, 0};
 
     hit_record rec;
     if (octree.intersectou(raio<double>(pontoIntersecao, normal(subtracao(pontoIntersecao, posicaoObservador))), 0.001, infinito, rec)) {
-        corDaEsfera = rec.cor;
+        // corDaEsfera = rec.cor;
+        corDaEsfera = {1, 0, 0};
     }
 
     if (profundidade <= 0) {

@@ -13,9 +13,9 @@ using namespace std;
 
 // Define a estrutura do BoundingBox
 struct BoundingBox {
-    vetor<double> min, max;
+    vetor<double> min, max; // limites do cubo
     BoundingBox() {}
-    BoundingBox(const vetor<double>& a, const vetor<double>& b) : min(a), max(b) {}
+    BoundingBox(const vetor<double>& a, const vetor<double>& b) : min(a), max(b) {} 
 };
 
 // Define a estrutura do OctreeNode
@@ -36,12 +36,13 @@ struct OctreeNode {
     bool intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const;
 };
 
+// divide o nó em 8 filhos
 void OctreeNode::subdivide() {
-    vetor<double> min = box.min;
-    vetor<double> max = box.max;
+    vetor<double> min = box.min; // inferior esquerdo
+    vetor<double> max = box.max; // superior direito
     vetor<double> mid = multiplicacaoPorEscalar(soma(min, max), 0.5);
 
-    // Cria novos nós filhos usando operador new e std::shared_ptr
+    // Cria novos nós filhos que contém as esferas que estão dentro deles (centro dentro)
     filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(min, mid))));
     filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(mid.x, min.y, min.z), vetor<double>(max.x, mid.y, mid.z)))));
     filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(mid.x, mid.y, min.z), vetor<double>(max.x, max.y, mid.z)))));
@@ -77,6 +78,7 @@ void OctreeNode::inserirEsfera(shared_ptr<sphere> esfera) {
     }
 }
 
+// checa se o raio atinge o nó pai ou algum de seus filhos
 bool OctreeNode::intersectou(const raio<double>& r, double t_min, double t_max, hit_record& rec) const {
     if (!intersectouBox(box, r, t_min, t_max)) {
         return false;
@@ -108,6 +110,7 @@ bool OctreeNode::intersectou(const raio<double>& r, double t_min, double t_max, 
     return hit;
 }
 
+// checa se o raio atinge o cubo e busca a menor box que contém o raio 
 bool OctreeNode::intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const {
     vetor<double> invD = {1.0 / r.direcao.x, 1.0 / r.direcao.y, 1.0 / r.direcao.z};
     vetor<double> t0 = multiplicacaoPorComponente(subtracao(box.min, r.origem), invD);
