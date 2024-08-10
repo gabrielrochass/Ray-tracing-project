@@ -11,7 +11,7 @@
 using namespace std;
 
 
-const double infinito = std::numeric_limits<double>::infinity();
+const double infinito = numeric_limits<double>::infinity();
 
 class phongComponentes{
     public:
@@ -68,15 +68,6 @@ vetor<double> calcularReflexao(vetor<double> Normal, vetor<double> L) {
 
 // calcula vetor de refração
 vetor<double> calcularRefracao(const vetor<double>& V, const vetor<double>& N, double ni, double nt) {
-    /*double eta = ni / nt;
-    double cosi = -produtoEscalar(N, I);
-    double sint2 = eta * eta * (1 - cosi * cosi);
-    if (sint2 > 1) {
-        // Reflexão total interna
-        return calcularReflexao(N, I);
-    }
-    double cost = sqrt(1 - sint2);
-    return eta * I + (eta * cosi - cost) * N;*/
     double cosO = produtoEscalar(N, V);
     double eta = ni / nt;
     double constante = 1 - eta * eta * (1 - cosO * cosO);
@@ -86,6 +77,7 @@ vetor<double> calcularRefracao(const vetor<double>& V, const vetor<double>& N, d
     double cosOt = sqrt(constante);
     return (eta*cosO - cosOt)*N - eta*V;
 }
+
 vetor<double> calcularIluminacaoPhong(
     vetor<double> pontoIntersecao, 
     vetor<double> Normal, 
@@ -111,14 +103,20 @@ vetor<double> calcularIluminacaoPhong(
         vetor<double> R = normal(2 * produtoEscalar(Normal, L) * Normal - L); // Reflexão da luz
         
         // Componentes de iluminação
-        vetor<double> difusa = multiplicacaoPorEscalar(luz.Id, produtoEscalar(Normal, L) * material.kd);
+        // vetor<double> difusa = multiplicacaoPorEscalar(luz.Id, produtoEscalar(Normal, L) * material.kd);
+        vetor<double> difusa = {0, 0, 0};
+        double NdotL = produtoEscalar(Normal, L);
+        if (NdotL > 0) {
+            difusa = multiplicacaoPorEscalar(luz.Id, NdotL * material.kd);
+        }
+
         vetor<double> especular = multiplicacaoPorEscalar(multiplicacaoPorEscalar(luz.Is, material.ks), pow(produtoEscalar(R, V), material.n));
 
         // Acumular iluminação resultante
         I = soma(I, soma(difusa, especular));
     }
 
-    vetor<double> corDaEsfera = {1, 0, 0};
+    vetor<double> corDaEsfera = {0, 0, 0};
 
     hit_record rec;
     if (octree.intersectou(raio<double>(pontoIntersecao, normal(subtracao(pontoIntersecao, posicaoObservador))), 0.001, infinito, rec)) {
@@ -156,7 +154,12 @@ vetor<double> calcularIluminacaoPhong(
         corRefracao = multiplicacaoPorEscalar(corRefracao, material.kt);
     }
 
+    // I = soma(I, soma(corReflexao, corRefracao));
     I = soma(I, soma(corReflexao, corRefracao));
+    if (I.x < 0.01 && I.y < 0.01 && I.z < 0.01) {
+        I = {0.01, 0.01, 0.01};  // Evita preto absoluto
+    }
+
     return multiplicacaoPorEscalar(multiplicacaoPorComponente(I, corDaEsfera), 0.8);
 }
 

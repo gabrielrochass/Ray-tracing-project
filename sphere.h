@@ -14,12 +14,18 @@ class sphere{
 
         bool hit(
             const raio<double>& raio, double t_min, double t_max, hit_record& rec) const;
+
+        bool intersectou(const raio<double>& r, double t_min, double t_max, hit_record& rec) const {
+            return hit(r, t_min, t_max, rec);
+        }
         
     public:
         vetor<double> center;
         double radius;
         vetor<double> cor;
 };
+
+// Função que verifica se um raio atinge a esfera pelo octree
 
 bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_record& rec) const{
     double a = produtoEscalar(raio.direcao, raio.direcao);

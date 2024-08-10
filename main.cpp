@@ -42,6 +42,7 @@ vetor<double> raioColor(const raio<double>& raio, const OctreeNode& octree, cons
         // Adiciona a iluminação Phong para cada luz
         for (int i = 0; i < luzes.luzes.size(); i++) {
             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, octree, plano1, 1);
+            // corFinal = corFinal + vetor<double>{0.0, 0.0, 0.8};
         }
         return corFinal;
     }
@@ -73,7 +74,9 @@ int main() {
     esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
     esferas.add(sphere(vetor<double>{0, -1, -1}, 0.4, vetor<double>{0.5, 0.5, 0.5})); // Esfera cinza
     esferas.add(sphere(vetor<double>{0, 1, -1}, 0.4, vetor<double>{1, 0, 1})); // Esfera rosa
-    // esferas.add(sphere(vetor<double>{0, 0, -2}, 0.5, vetor<double>{1, 1, 0})); // Esfera amarela
+    // esferas.add(sphere(vetor<double>{-1, -1, -1}, 0.5, vetor<double>{0.7,0.2,0})); // Esfera laranja
+    // esferas.add(sphere(vetor<double>{1, -1, -1}, 0.5, vetor<double>{0,0.4,0.2})); // Esfera verde
+    // esferas.add(sphere(vetor<double>{-1, 1, -1}, 0.5, vetor<double>{1, 1, 0})); // Esfera amarela
 
     // Cria o octree e adiciona as esferas
     OctreeNode octree(BoundingBox(vetor<double>{-1, -1, -1}, vetor<double>{1, 1, 1}));

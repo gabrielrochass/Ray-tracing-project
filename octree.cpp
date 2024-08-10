@@ -36,21 +36,22 @@ struct OctreeNode {
     bool intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const;
 };
 
-
 void OctreeNode::subdivide() {
     vetor<double> min = box.min;
     vetor<double> max = box.max;
     vetor<double> mid = multiplicacaoPorEscalar(soma(min, max), 0.5);
 
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(min, mid)));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, min.y, min.z), vetor<double>(max.x, mid.y, mid.z))));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, mid.y, min.z), vetor<double>(max.x, max.y, mid.z))));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, mid.y, min.z), vetor<double>(mid.x, max.y, mid.z))));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, min.y, mid.z), vetor<double>(mid.x, mid.y, max.z))));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(mid.x, min.y, mid.z), vetor<double>(max.x, mid.y, max.z))));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(mid, max)));
-    filhos.push_back(make_shared<OctreeNode>(BoundingBox(vetor<double>(min.x, mid.y, mid.z), vetor<double>(mid.x, max.y, max.z))));
+    // Cria novos nós filhos usando operador new e std::shared_ptr
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(min, mid))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(mid.x, min.y, min.z), vetor<double>(max.x, mid.y, mid.z)))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(mid.x, mid.y, min.z), vetor<double>(max.x, max.y, mid.z)))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(min.x, mid.y, min.z), vetor<double>(mid.x, max.y, mid.z)))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(min.x, min.y, mid.z), vetor<double>(mid.x, mid.y, max.z)))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(mid.x, min.y, mid.z), vetor<double>(max.x, mid.y, max.z)))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(mid, max))));
+    filhos.push_back(shared_ptr<OctreeNode>(new OctreeNode(BoundingBox(vetor<double>(min.x, mid.y, mid.z), vetor<double>(mid.x, max.y, max.z)))));
 
+    // Redistribui esferas para os filhos após a subdivisão
     for (auto& esfera : esferas) {
         for (auto& filho : filhos) {
             if (filho->intersectouBox(filho->box, raio<double>(esfera->center, vetor<double>(0, 0, 0)), 0.0, numeric_limits<double>::max())) {
@@ -58,12 +59,11 @@ void OctreeNode::subdivide() {
             }
         }
     }
-
     esferas.clear();
 }
 
 void OctreeNode::inserirEsfera(shared_ptr<sphere> esfera) {
-    if (filhos.empty()) {
+    if (ehFolha()) {
         esferas.push_back(esfera);
         if (esferas.size() > 8) {
             subdivide();
@@ -78,36 +78,34 @@ void OctreeNode::inserirEsfera(shared_ptr<sphere> esfera) {
 }
 
 bool OctreeNode::intersectou(const raio<double>& r, double t_min, double t_max, hit_record& rec) const {
-    if (!intersectouBox(box, r, t_min, t_max)) return false;
+    if (!intersectouBox(box, r, t_min, t_max)) {
+        return false;
+    }
 
-    bool acertouAlguem = false;
-    double maisPerto = t_max;
+    bool hit = false;
+    hit_record temp_rec;
 
-    if (ehFolha()) {
-        for (auto& esfera : esferas) {
-            hit_record temp_rec;
-            if (esfera->hit(r, t_min, maisPerto, temp_rec)) {
-                acertouAlguem = true;
-                maisPerto = temp_rec.t;
-                rec = temp_rec;
-            }
+    // Checa interseção com as esferas no nó atual
+    for (const auto& esfera : esferas) {
+        if (esfera->intersectou(r, t_min, t_max, temp_rec)) {
+            hit = true;
+            t_max = temp_rec.t;
+            rec = temp_rec;
         }
-    } else {
-        for (auto& filho : filhos) {
-            hit_record temp_rec;
-            if (filho->intersectou(r, t_min, maisPerto, temp_rec)) {
-                acertouAlguem = true;
-                maisPerto = temp_rec.t;
+    }
+
+    // Checa interseção com os filhos se não for uma folha
+    if (!ehFolha()) {
+        for (const auto& filho : filhos) {
+            if (filho->intersectou(r, t_min, t_max, temp_rec)) {
+                hit = true;
+                t_max = temp_rec.t;
                 rec = temp_rec;
             }
         }
     }
 
-    return acertouAlguem;
-}
-
-vetor<double> multiplicacaoPorComponente(const vetor<double>& a, const vetor<double>& b) {
-    return vetor<double>(a.x * b.x, a.y * b.y, a.z * b.z);
+    return hit;
 }
 
 bool OctreeNode::intersectouBox(const BoundingBox& box, const raio<double>& r, double t_min, double t_max) const {
