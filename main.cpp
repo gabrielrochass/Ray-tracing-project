@@ -102,20 +102,17 @@ int main() {
 
   
     // define a câmera
-    vetor<double> posicaoDaCamera(0, 0, 0);
+    vetor<double> posicaoDaCamera(0, 0, 1);
     vetor<double> mira(0, 0, -1);
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
 
-    // define o mundo
-    malha mundo;
     sphere_list esferas;
-    
-    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera verde
-    // esferas.add(sphere(vetor<double>{1, 0.5, -1}, 0.3, vetor<double>{0, 1, 0})); // Esfera azul
-    // esferas.add(sphere(vetor<double>{-1, -0.5, -1}, 0.3, vetor<double>{0, 0, 1})); // Esfera vermelha
-    esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
-    esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera central
+
+    // futuras esferas (?)
+    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); 
+    // esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); 
 
     // Define a iluminação e o material
     iluminacao luz{
