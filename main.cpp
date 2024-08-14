@@ -98,8 +98,8 @@ int main() {
     esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central
 
     // futuras esferas (?)
-    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); 
-    // esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); 
+    esferas.add(sphere(vetor<double>{1.5, 0, -1}, 0.7, vetor<double>{0, 1, 0})); 
+    esferas.add(sphere(vetor<double>{-1.5, 0, -1}, 0.7, vetor<double>{0, 0, 1})); 
 
     // Define a iluminação e o material
     iluminacao luz{
