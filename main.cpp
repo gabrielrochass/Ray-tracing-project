@@ -27,47 +27,17 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-// verifica se o ponto está em sombra
-bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const sphere_list& esferas, const plano& plano1) {
-    for (int i = 0; i < luzes.luzes.size(); i++) {
-        vetor<double> luzPos = luzes.acessarLuz(i).posicao;
-        raio<double> r(ponto, subtracao(luzPos, ponto));
-        hit_record rec;
-
-        // Verifica se há interseção com as esferas, malha de triângulos ou plano
-        bool intersecionouEsfera = esferas.hit(r, 0.001, infinity, rec);
-        bool intersecionouPlano = plano1.hitPlano(r, 0.001, infinity, rec);
-
-        // Se houver interseção com qualquer objeto, o ponto está na sombra para esta luz
-        if (intersecionouEsfera || intersecionouPlano) {
-            return true;
-        }
-    }
-
-    // Se nenhuma luz estiver obstruída, o ponto não está na sombra
-    return false;
-}
-
 vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
     hit_record rec;
-
-    plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
-
-    // Variável para armazenar a cor final do pixel
     vetor<double> corFinal = {0.0, 0.0, 0.0};
+
+    plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 1.0, 0.0});
 
     if (esferas.hit(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-            //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            // } else {
-            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            // }
             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
         }
         return corFinal;
@@ -77,13 +47,6 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
         vetor<double> N = vetorUni(rec.normal);
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-            //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            // } else {
-            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            // }
             corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, esferas, 2);
         }
         return corFinal;
@@ -108,7 +71,7 @@ int main() {
     Camera camera(posicaoDaCamera, mira, vUp);
 
     sphere_list esferas;
-    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, vetor<double>{1, 0, 0})); // Esfera central
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central
 
     // futuras esferas (?)
     // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); 
