@@ -14,6 +14,7 @@
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
+#include "textura.cpp"
 
 using namespace std;
 
@@ -63,6 +64,8 @@ int main() {
     const int imHeight = static_cast<int>(imWidth / (16.0 / 9.0));
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
+    // carregar textura
+    Textura textura1("texturas/moana.jpg");
   
     // define a câmera
     vetor<double> posicaoDaCamera(0, 0, 1);
