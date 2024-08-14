@@ -19,15 +19,17 @@ malha gerarToro(malha& m, double R, double r, int num_theta, int num_phi) {
     double dtheta = 2 * PI / num_theta;
     double dphi = 2 * PI / num_phi;
 
+    if (r == R) { r += 0.0000001; }
+
     // Gerar vértices
     for (int i = 0; i < num_theta; ++i) {
         double theta = i * dtheta;
         for (int j = 0; j < num_phi; ++j) {
             double phi = j * dphi;
 
-            double x = (R + r * cos(phi)) * cos(theta);
+            double x = (R + (r * cos(phi))) * cos(theta);
             double y = r * sin(phi);
-            double z = (R + r * cos(phi)) * sin(theta);
+            double z = (R + (r * cos(phi))) * sin(theta);
 
             vertices[i].push_back(vetor<double>(x, y, z));
             //vertices.push_back(rotacaoX.multMatrizVetor(vetor<double>(x, y, z)));

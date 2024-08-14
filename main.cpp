@@ -163,8 +163,8 @@ int main() {
     triangulo tri4(v10, v11, v12);
 
     // Adiciona o toro à malha
-    double R = 0.8; // Raio do círculo do toro
-    double r = 0.1; // Raio do tubo
+    double R = 2; // Raio do círculo do toro
+    double r = 0.2; // Raio do tubo
     int num_theta = 50; // Número de divisões ao longo do círculo do toro
     int num_phi = 50;   // Número de divisões ao longo do tubo
 
