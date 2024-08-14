@@ -19,6 +19,7 @@
 using namespace std;
 
 const double infinity = numeric_limits<double>::infinity();
+const double pi = 3.14159265358979323846;
 
 // define a cor do fundo
 vetor<double> backgroundColor(const vetor<double>& dir) {
@@ -28,7 +29,19 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
+// mapeia coordenadas esféricas para coordenadas uv
+vetor<double> calularCoordenadasUV(const vetor<double>& pontoDeIntersecao) {
+    double phi = atan2(pontoDeIntersecao.z, pontoDeIntersecao.x);
+    double theta = asin(pontoDeIntersecao.y);
+
+    double u = 1 - (phi + pi) / (2 * pi);
+    double v = (theta + pi / 2) / pi;
+
+    return vetor<double>(u, v, 0);
+} 
+
+// calcula a cor de um pixel
+vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf, const Textura& textura) {
     hit_record rec;
     vetor<double> corFinal = {0.0, 0.0, 0.0};
 
@@ -37,6 +50,11 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
     if (esferas.hit(raio, 0, infinity, rec)) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
+
+        // uv mapping
+        vetor<double> uv = calularCoordenadasUV(N);
+        vetor<double> corTextura = textura.corTextura(uv.x, uv.y);
+        corFinal = corTextura;
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
             corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
@@ -65,7 +83,7 @@ int main() {
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
     // carregar textura
-    Textura textura1("texturas/moana.jpg");
+    Textura textura1("texturas/deserto.bmp");
   
     // define a câmera
     vetor<double> posicaoDaCamera(0, 0, 1);
@@ -136,7 +154,7 @@ int main() {
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas); 
+            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas, textura1); 
             image[j][i] = color;
         }
     }
