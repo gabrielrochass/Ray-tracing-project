@@ -28,7 +28,7 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
 }
 
 // verifica se o ponto está em sombra
-bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
+bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const sphere_list& esferas, const plano& plano1) {
     for (int i = 0; i < luzes.luzes.size(); i++) {
         vetor<double> luzPos = luzes.acessarLuz(i).posicao;
         raio<double> r(ponto, subtracao(luzPos, ponto));
@@ -36,11 +36,10 @@ bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mun
 
         // Verifica se há interseção com as esferas, malha de triângulos ou plano
         bool intersecionouEsfera = esferas.hit(r, 0.001, infinity, rec);
-        bool intersecionouMalha = mundo.hit(r, 0.001, infinity, rec);
         bool intersecionouPlano = plano1.hitPlano(r, 0.001, infinity, rec);
 
         // Se houver interseção com qualquer objeto, o ponto está na sombra para esta luz
-        if (intersecionouEsfera || intersecionouMalha || intersecionouPlano) {
+        if (intersecionouEsfera || intersecionouPlano) {
             return true;
         }
     }
@@ -49,7 +48,7 @@ bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mun
     return false;
 }
 
-vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
+vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
     hit_record rec;
 
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
@@ -88,9 +87,6 @@ vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphe
             corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, esferas, 2);
         }
         return corFinal;
-    } else if (mundo.hit(raio, 0, infinity, rec)) {
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
     }
 
     vetor<double> direcao_uni = vetorUni(raio.direcao);
@@ -111,22 +107,6 @@ int main() {
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
 
-    
-    double angulo = 3.14 / 4; 
-    // define a rotação eixo Z
-    matriz4x4 rotacaoZ = matriz4x4::createRotationZ(angulo,false);
-
-    // define a rotação eixo X
-    matriz4x4 rotacaoX = matriz4x4::createRotationX(angulo,false);
-
-    //translação para a direita
-    matriz4x4 trans = matriz4x4::createTranslation(-0.5, 0, 0);
-
-    // define a rotação eixo Y
-    matriz4x4 rotacaoY = matriz4x4::createRotationY(angulo,false);
-
-    
-
     // define o mundo
     malha mundo;
     sphere_list esferas;
@@ -136,45 +116,6 @@ int main() {
     // esferas.add(sphere(vetor<double>{-1, -0.5, -1}, 0.3, vetor<double>{0, 0, 1})); // Esfera vermelha
     esferas.add(sphere(vetor<double>{1, 0, -1}, 0.4, vetor<double>{0, 1, 0})); // Esfera azul
     esferas.add(sphere(vetor<double>{-1, 0, -1}, 0.4, vetor<double>{0, 0, 1})); // Esfera vermelha
-    
-    // adiciona triângulos à malha
-    // criação dos vértices triângulo 1 rotacionado eixo Z
-    vetor<double> v1 = rotacaoZ.multMatrizVetor({1, 0, -1});
-    vetor<double> v2 = rotacaoZ.multMatrizVetor({1, -1, -1});
-    vetor<double> v3 = rotacaoZ.multMatrizVetor({2, 0, -1});
-    triangulo tri1(v1, v2, v3);
-
-    // criação dos vértices triângulo 2 transladado para a direita
-    vetor<double> v4 = trans.multMatrizVetor({0, 0 , -1});
-    vetor<double> v5 = trans.multMatrizVetor({0, -1, -1});
-    vetor<double> v6 = trans.multMatrizVetor({1, 0, -1});
-    triangulo tri2(v4, v5, v6);
-
-    // criação dos vértices triângulo 3 rotacionado eixo X
-    vetor<double> v7 = rotacaoX.multMatrizVetor({-1, 0, -1});
-    vetor<double> v8 = rotacaoX.multMatrizVetor({-1, -1, -1});
-    vetor<double> v9 = rotacaoX.multMatrizVetor({0, 0, -1});
-    triangulo tri3(v7, v8, v9);
-
-    // criação dos vértices triângulo 4 rotacionado eixo Y
-    vetor<double> v10 = rotacaoY.multMatrizVetor({-2, 0, -1});
-    vetor<double> v11 = rotacaoY.multMatrizVetor({-2, -1, -1});
-    vetor<double> v12 = rotacaoY.multMatrizVetor({-1, 0, -1});
-    triangulo tri4(v10, v11, v12);
-
-    
-    // adiciona os triangulos ao mundo
-    /*mundo.add(tri1);
-    mundo.add(tri2);
-    mundo.add(tri3);
-    mundo.add(tri4);*/
-  
-    //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
-    //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    //mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
-    
-    // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
-    // cada vetor<double> é um ponto no espaço 3D
 
     // Define a iluminação e o material
     iluminacao luz{
@@ -195,8 +136,6 @@ int main() {
     luzes.addLuz(luz);
     luzes.addLuz(luz2);
 
-    //phongComponentes material(0.1, 0.1, 0.9, 100, 0.0, 0.0, 0.1, 1.5);
-    // phongComponentes material(0.1, 0.9, 0.5, 10.0, 1.0, 1.0, 1.0, 10.5);
     phongComponentes material(  0.1, // ka
                                 0.3, // kd
                                 0.9, // ks
@@ -211,20 +150,13 @@ int main() {
                                 0.3, // kd
                                 0.9, // ks
                                 10.0, // n
-                                0, // kr
-                                1, // kt
+                                0.5, // kr
+                                0.5, // kt
                                 1.0, // n1
                                 10.5 // n2
                                 );
-    // phongComponentes material(  0.1, // ka
-    //                             0.3, // kd
-    //                             0.9, // ks
-    //                             10.0, // n
-    //                             0.0, // kr
-    //                             0.6, // kt
-    //                             1.0, // n1
-    //                             1.5 // n2
-    //                             );
+
+
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
@@ -241,7 +173,7 @@ int main() {
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
+            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas); 
             image[j][i] = color;
         }
     }
@@ -257,27 +189,6 @@ int main() {
         }
     }
 
-    
-
-
-    clog << "\rDone.                 \n";
-    
+    clog << "\rDone.\n";   
     return 0;
 }
-
-// Adicione triângulos à malha
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
-    // mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
-
-    // adiciona esferas ao mundo
-    // esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
-
-
- // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
-
-    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));
