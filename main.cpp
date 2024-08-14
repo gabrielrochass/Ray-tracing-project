@@ -57,7 +57,7 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
         corFinal = corTextura;
 
         for (int i = 0; i < luzes.luzes.size(); i++) {
-            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
+            // corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
         }
         return corFinal;
 
@@ -83,7 +83,10 @@ int main() {
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
     // carregar textura
-    Textura textura1("texturas/deserto.bmp");
+    // Textura textura1("texturas/deserto.bmp");
+    // Textura textura1("texturas/moana.bmp");
+    // Textura textura1("texturas/parede-verde.bmp");
+    Textura textura1("texturas/tapete.bmp");
   
     // define a câmera
     vetor<double> posicaoDaCamera(0, 0, 1);
