@@ -68,16 +68,36 @@ BSPNode* buildBSP(const std::vector<sphere_list>& spheres, const std::vector<mal
 
     int axis = chooseAxis(spheres, triangles);
     node->axis = axis;
-    
+
     // Comparator para esferas
-    auto sphereComparator = [axis](const sphere_list& sphere1, const sphere_list& sphere2) {
+    /*auto sphereComparator = [axis](const sphere_list& sphere1, const sphere_list& sphere2) {
         return getAxisValue(sphere1.list[0].center, axis) < getAxisValue(sphere2.list[0].center, axis);
-        
+
     };
 
     // Comparator para malhas
     auto triangleComparator = [axis](const malha& malha1, const malha& malha2) {
         return getAxisValue(malha1.lista_triangulos[0].getCentro(), axis) < getAxisValue(malha2.lista_triangulos[0].getCentro(), axis);
+    };
+    */
+   // Comparator para esferas
+    auto sphereComparator = [axis](const sphere_list& sphere1, const sphere_list& sphere2) {
+        for (size_t i = 0; i < sphere1.list.size() && i < sphere2.list.size(); ++i) {
+            if (getAxisValue(sphere1.list[i].center, axis) != getAxisValue(sphere2.list[i].center, axis)) {
+                return getAxisValue(sphere1.list[i].center, axis) < getAxisValue(sphere2.list[i].center, axis);
+            }
+        }
+        return sphere1.list.size() < sphere2.list.size();  // Caso todos sejam iguais, compare pelo tamanho da lista
+    };
+
+    // Comparator para malhas
+    auto triangleComparator = [axis](const malha& malha1, const malha& malha2) {
+        for (size_t i = 0; i < malha1.lista_triangulos.size() && i < malha2.lista_triangulos.size(); ++i) {
+            if (getAxisValue(malha1.lista_triangulos[i].getCentro(), axis) != getAxisValue(malha2.lista_triangulos[i].getCentro(), axis)) {
+                return getAxisValue(malha1.lista_triangulos[i].getCentro(), axis) < getAxisValue(malha2.lista_triangulos[i].getCentro(), axis);
+            }
+        }
+        return malha1.lista_triangulos.size() < malha2.lista_triangulos.size();  // Caso todos sejam iguais, compare pelo tamanho da lista
     };
 
     // Ordenar as esferas
