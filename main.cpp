@@ -82,25 +82,26 @@ int main() {
     const int imHeight = static_cast<int>(imWidth / (16.0 / 9.0));
     vector<vector<vetor<double>>> image(imHeight, vector<vetor<double>>(imWidth));
 
-    // carregar textura
-    // Textura textura1("texturas/deserto.bmp");
-    // Textura textura1("texturas/moana.bmp");
-    // Textura textura1("texturas/parede-verde.bmp");
-    // Textura textura1("texturas/tapete.bmp");
-    Textura textura1("texturas/terra.bmp");
-  
     // define a câmera
     vetor<double> posicaoDaCamera(0, 0, 1);
     vetor<double> mira(0, 0, -1);
     vetor<double> vUp(0, 1, 0);
     Camera camera(posicaoDaCamera, mira, vUp);
+    
+    // carregar textura
+    // Textura textura1("texturas/deserto.bmp");
+    // Textura textura1("texturas/moana.bmp");
+    // Textura textura1("texturas/parede-verde.bmp");
+    // Textura textura1("texturas/tapete.bmp");
+     const Textura* textura1 = new Textura("texturas/terra.bmp");
 
     sphere_list esferas;
-    esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0.5, 0.5, 0.5}, *textura1)); // Esfera central
 
     // futuras esferas (?)
-    esferas.add(sphere(vetor<double>{1.5, 0, -1}, 0.7, vetor<double>{0, 1, 0})); 
-    esferas.add(sphere(vetor<double>{-1.5, 0, -1}, 0.7, vetor<double>{0, 0, 1})); 
+    // esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central
+    // esferas.add(sphere(vetor<double>{1.5, 0, -1}, 0.7, vetor<double>{0, 1, 0})); 
+    // esferas.add(sphere(vetor<double>{-1.5, 0, -1}, 0.7, vetor<double>{0, 0, 1})); 
 
     // Define a iluminação e o material
     iluminacao luz{
@@ -157,7 +158,7 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas, textura1); 
+            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas, *textura1);
             image[j][i] = color;
         }
     }

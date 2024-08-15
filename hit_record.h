@@ -3,6 +3,7 @@
 #define HIT_RECORD_H
 
 #include "vector.h"
+#include "textura.cpp"
 
 struct hit_record {
     vetor<double> p;
@@ -10,8 +11,7 @@ struct hit_record {
     double t;
     double indice_tri;
     vetor<double> cor;
-    
-    
+    Textura* textura;
 };
 
 #endif // HIT_RECORD_H

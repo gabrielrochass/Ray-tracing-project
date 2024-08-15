@@ -4,6 +4,8 @@
 #include "sphere.h"
 #include "vector.h"
 #include "raio.h"
+#include "hit_record.h"
+#include "textura.cpp"
 #include <vector>
 
 using namespace std;
@@ -31,7 +33,12 @@ bool sphere_list::hit(const raio<double>& raio, double t_min, double t_max, hit_
             hit_anything = true;
             closest_so_far = temp_rec.t;
             rec = temp_rec;
+            if (rec.textura != nullptr) {
+                rec.cor = l.textura->corTextura(l.obterCoordenadasUV(rec.normal).x, l.obterCoordenadasUV(rec.normal).y);
             rec.cor = l.cor;
+            } else {
+                rec.cor = l.cor;
+            }
         }
     }
 

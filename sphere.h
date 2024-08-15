@@ -4,21 +4,23 @@
 #include "vector.h"
 #include "hit_record.h"
 #include "raio.h"
+#include "textura.cpp"
 using namespace std;
 
 
 class sphere{
     public:
         sphere() {}
-        sphere(vetor<double> c, double r, vetor<double>cor) : center(c), radius(r), cor(cor) {};
+        sphere(vetor<double> c, double r, const Textura* t = nullptr) : center(c), radius(r), textura(t) {};
 
-        bool hit(
-            const raio<double>& raio, double t_min, double t_max, hit_record& rec) const;
+        bool hit(const raio<double>& raio, double t_min, double t_max, hit_record& rec) const;
+        vetor<double> obterCoordenadasUV(const vetor<double>& pontoDeIntersecao) const;
         
     public:
         vetor<double> center;
         double radius;
         vetor<double> cor;
+        const Textura* textura;
 };
 
 bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_record& rec) const{
@@ -45,10 +47,25 @@ bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_recor
 
     rec.t = root;
     rec.p = raioAt(raio, rec.t);
-    //rec.normal = multiplicacaoPorEscalar(subtracao(rec.p, center), 1.0 / radius);
     rec.normal = vetorUni(subtracao(rec.p, center));
-    rec.cor = cor;
+
+    if (textura != nullptr) {
+        rec.cor = textura->corTextura(obterCoordenadasUV(rec.normal).x, obterCoordenadasUV(rec.normal).y);
+    } else {
+        rec.cor = cor;
+    }
+    
     return true;
+}
+
+vetor<double> sphere::obterCoordenadasUV(const vetor<double>& pontoDeIntersecao) const {
+    double phi = atan2(pontoDeIntersecao.z, pontoDeIntersecao.x);
+    double theta = asin(pontoDeIntersecao.y);
+
+    double u = 1 - (phi + pi) / (2 * pi);
+    double v = (theta + pi / 2) / pi;
+
+    return vetor<double>(u, v, 0);
 }
 
 #endif
