@@ -86,7 +86,8 @@ int main() {
     // Textura textura1("texturas/deserto.bmp");
     // Textura textura1("texturas/moana.bmp");
     // Textura textura1("texturas/parede-verde.bmp");
-    Textura textura1("texturas/tapete.bmp");
+    // Textura textura1("texturas/tapete.bmp");
+    Textura textura1("texturas/terra.bmp");
   
     // define a câmera
     vetor<double> posicaoDaCamera(0, 0, 1);
@@ -156,7 +157,6 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
             vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas, textura1); 
             image[j][i] = color;
         }
