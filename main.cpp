@@ -42,21 +42,36 @@ vetor<double> calularCoordenadasUV(const vetor<double>& pontoDeIntersecao) {
 } 
 
 // calcula a cor de um pixel
-vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf, const Textura& textura) {
+vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
     hit_record rec;
     vetor<double> corFinal = {0.0, 0.0, 0.0};
+    bool hitAnything = false;
+    double t_closest = infinity;
+    const sphere* hit_sphere = nullptr;
 
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 1.0, 0.0});
 
-    if (esferas.hit(raio, 0, infinity, rec)) {
+    // Verifica a interseção com as esferas
+    for (const auto& esfera : esferas.list) {
+        hit_record temp_rec;
+        if (esfera.hit(raio, 0, t_closest, temp_rec)) {
+            t_closest = temp_rec.t;
+            rec = temp_rec;
+            hit_sphere = &esfera;
+            hitAnything = true;
+        }
+    }
+
+    if (hitAnything && hit_sphere) {
         vetor<double> p = raioAt(raio, rec.t);
         vetor<double> N = vetorUni(rec.normal);
 
-        // uv mapping
-        vetor<double> uv = calularCoordenadasUV(N);
-        vetor<double> corTextura = textura.corTextura(uv.x, uv.y);
+        // UV mapping
+        vetor<double> uv = hit_sphere->obterCoordenadasUV(p - hit_sphere->center);
+        vetor<double> corTextura = hit_sphere->textura ? hit_sphere->textura->corTextura(uv.x, uv.y) : rec.cor;
         corFinal = corTextura;
 
+        // Adiciona a iluminação
         for (int i = 0; i < luzes.luzes.size(); i++) {
             // corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
         }
@@ -77,6 +92,7 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
 }
 
 
+
 int main() {
     // define a imagem
     const int imWidth = 800;
@@ -90,14 +106,16 @@ int main() {
     Camera camera(posicaoDaCamera, mira, vUp);
     
     // carregar textura
-    // Textura textura1("texturas/deserto.bmp");
-    // Textura textura1("texturas/moana.bmp");
-    // Textura textura1("texturas/parede-verde.bmp");
-    // Textura textura1("texturas/tapete.bmp");
-     const Textura* textura1 = new Textura("texturas/terra.bmp");
+    const Textura* textura1 = new Textura("texturas/terra.bmp");
+    const Textura* textura2 = new Textura("texturas/parede-verde.bmp");
+    const Textura* textura3 = new Textura("texturas/tapete.bmp");
+    const Textura* textura4 = new Textura("texturas/moana.bmp");
+
 
     sphere_list esferas;
-    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, textura1)); // Esfera central
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 1, textura1)); // Esfera central
+    esferas.add(sphere(vetor<double>{1.5, 0, -1}, 0.7, textura2));
+
 
     // futuras esferas (?)
     // esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central
@@ -159,7 +177,7 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas, *textura1);
+            vetor<double> color = raioColor(r, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
             image[j][i] = color;
         }
     }

@@ -49,11 +49,8 @@ bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_recor
     rec.p = raioAt(raio, rec.t);
     rec.normal = vetorUni(subtracao(rec.p, center));
 
-    if (textura != nullptr) {
-        rec.cor = textura->corTextura(obterCoordenadasUV(rec.normal).x, obterCoordenadasUV(rec.normal).y);
-    } else {
-        rec.cor = cor;
-    }
+    // rec.cor = textura->corTextura(obterCoordenadasUV(rec.normal).x, obterCoordenadasUV(rec.normal).y);
+    rec.cor = vetor<double>(1, 0, 0);
     
     return true;
 }
