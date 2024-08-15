@@ -110,12 +110,13 @@ int main() {
     const Textura* textura2 = new Textura("texturas/parede-verde.bmp");
     const Textura* textura3 = new Textura("texturas/tapete.bmp");
     const Textura* textura4 = new Textura("texturas/moana.bmp");
+    const Textura* textura5 = new Textura("texturas/jupter.bmp");
 
 
     sphere_list esferas;
     esferas.add(sphere(vetor<double>{0, 0, -1}, 1, textura1)); // Esfera central
-    esferas.add(sphere(vetor<double>{1.7, 0, -1}, 0.7, textura2));
-    esferas.add(sphere(vetor<double>{-1.7, 0, -1}, 0.7, textura4));
+    esferas.add(sphere(vetor<double>{1.7, 0, -1}, 0.7, textura3));
+    esferas.add(sphere(vetor<double>{-1.7, 0, -1}, 0.7, textura5));
 
 
     // futuras esferas (?)
