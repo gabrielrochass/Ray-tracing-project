@@ -14,6 +14,7 @@
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
+#include "BSP.h"
 
 using namespace std;
 
@@ -27,74 +28,82 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-// verifica se o ponto está em sombra
-bool estaNaSombra(const vetor<double>& ponto, listaLuzes luzes, const malha& mundo, const sphere_list& esferas, const plano& plano1) {
-    for (int i = 0; i < luzes.luzes.size(); i++) {
-        vetor<double> luzPos = luzes.acessarLuz(i).posicao;
-        raio<double> r(ponto, subtracao(luzPos, ponto));
-        hit_record rec;
 
-        // Verifica se há interseção com as esferas, malha de triângulos ou plano
-        bool intersecionouEsfera = esferas.hit(r, 0.001, infinity, rec);
-        bool intersecionouMalha = mundo.hit(r, 0.001, infinity, rec);
-        bool intersecionouPlano = plano1.hitPlano(r, 0.001, infinity, rec);
 
-        // Se houver interseção com qualquer objeto, o ponto está na sombra para esta luz
-        if (intersecionouEsfera || intersecionouMalha || intersecionouPlano) {
+
+bool intersectRayBSP(const raio<double>& ray, BSPNode* node, double t_min, double t_max, hit_record& rec) {
+    if (!node) return false;
+
+    if (node->spheres.size() + node->triangles.size() > 0) {
+        hit_record tempRec;
+        bool hitAnything = false;
+        double closestSoFar = t_max;
+
+        for (const auto& sphere : node->spheres) {
+            if (sphere.hit(ray, t_min, closestSoFar, tempRec)) {
+                hitAnything = true;
+                closestSoFar = tempRec.t;
+                rec = tempRec;
+            }
+        }
+
+        for (const auto& triangle : node->triangles) {
+            if (triangle.hit(ray, t_min, closestSoFar, tempRec)) {
+                hitAnything = true;
+                closestSoFar = tempRec.t;
+                rec = tempRec;
+            }
+        }
+
+        return hitAnything;
+    }
+
+    double tPlane = (node->median_value - getAxisValue(ray.origem, node->axis)) / getAxisValue(ray.direcao, node->axis);
+
+    BSPNode* firstChild;
+    BSPNode* secondChild;
+
+    if (getAxisValue(ray.origem, node->axis) < node->median_value) {
+        firstChild = node->left;
+        secondChild = node->right;
+    } else {
+        firstChild = node->right;
+        secondChild = node->left;
+    }
+
+    if (tPlane > t_max || tPlane <= 0) {
+        return intersectRayBSP(ray, firstChild, t_min, t_max, rec);
+    } else if (tPlane < t_min) {
+        return intersectRayBSP(ray, secondChild, t_min, t_max, rec);
+    } else {
+        if (intersectRayBSP(ray, firstChild, t_min, tPlane, rec)) {
             return true;
         }
+        return intersectRayBSP(ray, secondChild, tPlane, t_max, rec);
     }
-
-    // Se nenhuma luz estiver obstruída, o ponto não está na sombra
-    return false;
 }
 
-vetor<double> raioColor(const raio<double>& raio, const malha& mundo, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
+vetor<double> raioColor(const raio<double>& r, BSPNode& root, const vetor<double>& origem, const listaLuzes& luzes, const phongComponentes& material, const phongComponentes& materialEsferas) {
     hit_record rec;
-
-    plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 0.0, 1.0});
-
-    // Variável para armazenar a cor final do pixel
-    vetor<double> corFinal = {0.0, 0.0, 0.0};
-
-    if (esferas.hit(raio, 0, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-            //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            // } else {
-            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            // }
-            corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
+    if (intersectRayBSP(r, &root, 0.001, infinity, rec)) {
+        vetor<double> cor(0, 0, 0);
+        for (const auto& luz : luzes.luzes) {
+            cor += material.ka * luz.Ia;
+            vetor<double> direcaoLuz = normal(subtracao(luz.posicao, rec.p));
+            double difusa = produtoEscalar(rec.normal, direcaoLuz);
+            if (difusa > 0) {
+                cor += multiplicacaoPorEscalar(multiplicacaoPorEscalar(luz.Id, material.kd), difusa);
+                //vetor<double> direcaoRefletida = refletir(direcaoLuz, rec.normal); o que seria esse refletir?
+                vetor<double> direcaoRefletida = normal(subtracao(mult(2 * produtoEscalar(direcaoLuz, rec.normal), rec.normal), direcaoLuz));
+                double especular = produtoEscalar(r.direcao, direcaoRefletida);
+                if (especular > 0) {
+                    cor += multiplicacaoPorEscalar(multiplicacaoPorEscalar(luz.Is, material.ks), pow(especular, material.n));
+                }
+            }
         }
-        return corFinal;
-
-    } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            // if (estaNaSombra(p, luzes, mundo, esferas, plano1)) {
-            //     // Adiciona apenas a luz ambiente se estiver na sombra
-            //     corFinal = corFinal + mult(0.6, luzes.acessarLuz(i).Ia);
-            // } else {
-            //     // Adiciona a contribuição da iluminação Phong se não estiver na sombra
-            //     corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, esferas);
-            // }
-            corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, esferas, 2);
-        }
-        return corFinal;
-    } else if (mundo.hit(raio, 0, infinity, rec)) {
-        vetor<double> color = mult(0.65, soma(vetor<double>{1, 1, 1}, rec.normal));
-        return color;
+        return cor;
     }
-
-    vetor<double> direcao_uni = vetorUni(raio.direcao);
-    return backgroundColor(direcao_uni);
+    return backgroundColor(r.direcao);
 }
 
 
@@ -164,10 +173,10 @@ int main() {
 
     
     // adiciona os triangulos ao mundo
-    /*mundo.add(tri1);
+    mundo.add(tri1);
     mundo.add(tri2);
     mundo.add(tri3);
-    mundo.add(tri4);*/
+    mundo.add(tri4);
   
     //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
     //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
@@ -216,21 +225,17 @@ int main() {
                                 1.0, // n1
                                 10.5 // n2
                                 );
-    // phongComponentes material(  0.1, // ka
-    //                             0.3, // kd
-    //                             0.9, // ks
-    //                             10.0, // n
-    //                             0.0, // kr
-    //                             0.6, // kt
-    //                             1.0, // n1
-    //                             1.5 // n2
-    //                             );
+      
     // define a viewport
     const vetor<double> larguraDaViewport(32.0 / 9.0, 0.0, 0.0);
     const vetor<double> alturaDaViewport(0.0, 2.0, 0.0);
     vetor<double> cantoEsquerdoTela = subtracao(subtracao(subtracao(camera.posicaoDaCamera, mult(0.5, larguraDaViewport)), mult(0.5, alturaDaViewport)), mira);
     //vetor cantoEsquerdoTela = origem - horizontal/2 - vertical/2 - mira
-    
+    vector<sphere_list> esferass;
+    esferass.push_back(esferas);
+    vector<malha> mundos;
+    mundos.push_back(mundo);
+    BSPNode* root = buildBSP(esferass, mundos);
     
     // define a cor do fundo
     for (int j = 0; j < imHeight; ++j) {
@@ -241,7 +246,9 @@ int main() {
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
             // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
+            //vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
+            //Put the BSP structure in the new function raioColor
+            vetor<double> color = raioColor(r, *root, camera.posicaoDaCamera, luzes, material, materialEsferas);
             image[j][i] = color;
         }
     }
@@ -265,19 +272,3 @@ int main() {
     return 0;
 }
 
-// Adicione triângulos à malha
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{1, 0, -1}, vetor<double>{0, 1, -1}));
-    // mundo.add(triangulo(vetor<double>{1, 0, -1}, vetor<double>{1, 1, -1}, vetor<double>{0, 1, -1}));
-
-    // adiciona esferas ao mundo
-    // esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{0, -1, -1}, 0.5));
-    // esferas.add(sphere(vetor<double>{1, 0, -1}, 0.5));
-
-
- // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1})); // meio para baixo pra diretia
-    // mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{1, 0, -1})); 
-
-    // mundo.add(triangulo(vetor<double>{0.8, 0, -1}, vetor<double>{0.8, -1, -1}, vetor<double>{1.8, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    // mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{0, 1, -1}, vetor<double>{-1, 1, -1}));

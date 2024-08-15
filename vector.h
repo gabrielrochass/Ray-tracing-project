@@ -73,6 +73,12 @@ vetor<T> operator/(const vetor<T>& v, T scalar) {
 }   
 
 template<typename T>
+vetor<T> operator/(const vetor<T>& v, const vetor<T>& v2) {
+    return vetor<T>(v.x / v2.x, v.y / v2.y, v.z / v2.z);
+    return v;
+}
+
+template<typename T>
 vetor<T> normal(vetor<T> v) {
     return v / norma(v);
 }

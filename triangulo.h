@@ -16,6 +16,10 @@ class triangulo{
             vetor2 = subtracao(vertice3, vertice1);
             vetor3 = subtracao(vertice3, vertice2);
         };
+        //formula para achar o valor do centro do triangulo
+        vetor<double> getCentro() const{
+            return vetor<double>((vertice1.x + vertice2.x + vertice3.x) / 3, (vertice1.y + vertice2.y + vertice3.y) / 3, (vertice1.z + vertice2.z + vertice3.z) / 3);
+        }
 
         bool hit(const vetor<double>& pontoNoPlano, const vetor<double>& normal, const raio<double>& raioDeInterseccao, const raio<double>& raio, double t_min, double t_max, hit_record& rec) const{
                 double denominador = produtoEscalar(normal, raioDeInterseccao.direcao); // usado pra determinar se o raio é paralelo ao plano
