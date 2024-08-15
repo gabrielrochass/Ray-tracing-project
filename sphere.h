@@ -4,7 +4,7 @@
 #include "vector.h"
 #include "hit_record.h"
 #include "raio.h"
-#include "textura.cpp"
+#include "textura.h"
 using namespace std;
 
 
@@ -59,6 +59,7 @@ bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_recor
 }
 
 vetor<double> sphere::obterCoordenadasUV(const vetor<double>& pontoDeIntersecao) const {
+    const double pi = 3.14159265358979323846;
     double phi = atan2(pontoDeIntersecao.z, pontoDeIntersecao.x);
     double theta = asin(pontoDeIntersecao.y);
 

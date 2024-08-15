@@ -15,6 +15,7 @@
 #include "matriz4x4.h"
 #include "phongComponentes.h"
 #include "textura.cpp"
+#include "textura.h"
 
 using namespace std;
 
@@ -96,7 +97,7 @@ int main() {
      const Textura* textura1 = new Textura("texturas/terra.bmp");
 
     sphere_list esferas;
-    esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0.5, 0.5, 0.5}, *textura1)); // Esfera central
+    esferas.add(sphere(vetor<double>{0, 0, -1}, 0.5, textura1)); // Esfera central
 
     // futuras esferas (?)
     // esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central

@@ -5,7 +5,7 @@
 #include "vector.h"
 #include "raio.h"
 #include "hit_record.h"
-#include "textura.cpp"
+#include "textura.h"
 #include <vector>
 
 using namespace std;

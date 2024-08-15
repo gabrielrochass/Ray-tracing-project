@@ -3,7 +3,7 @@
 #define HIT_RECORD_H
 
 #include "vector.h"
-#include "textura.cpp"
+#include "textura.h"
 
 struct hit_record {
     vetor<double> p;
