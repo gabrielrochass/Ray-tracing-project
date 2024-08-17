@@ -26,18 +26,6 @@ class plano {
         bool hitPlano(const raio<double>& r, double t_min, double t_max, hit_record& rec) const;
 };
 
-// define se um raio intersecta ou não um plano -> retorna true se intersecta, false caso contrário
-/*bool plano::hitPlano(const plano& plano, const raio<double>& raioDeInterseccao) {
-    double denominador = produtoEscalar(plano.normal, raioDeInterseccao.direcao); // usado pra determinar se o raio é paralelo ao plano
-    // Verifica se o denominador é zero para evitar divisão por zero
-    if (fabs(denominador) < 1e-6) { // 0
-        return false; // Raio é paralelo ao plano -> não intersecta
-    }
-    // Calcula a distância para o ponto de interseção ao longo do raio
-    double t = -produtoEscalar(subtracao(raioDeInterseccao.origem, plano.pontoNoPlano), plano.normal) / denominador;
-    return t >= 0; // Se t for maior ou igual a zero, o raio intersecta o plano
-} //**************
-*/
 
 bool plano::hitPlano(const raio<double>& r, double t_min, double t_max, hit_record& rec) const {
         double denom = produtoEscalar(normal, r.direcao);

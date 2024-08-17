@@ -1,3 +1,6 @@
+#ifndef BSP_H
+#define BSP_H
+
 #include <vector>
 #include <algorithm>
 #include <memory>
@@ -5,9 +8,12 @@
 #include "sphere_list.h"  
 #include "malha_triangulos.h" 
 
+using namespace std;
+
 struct BSPNode {
-    std::vector<sphere_list> spheres;
-    std::vector<malha> triangles;
+    
+    vector<sphere_list> spheres;
+    vector<malha> triangles;
     int axis;  // Eixo de divisão
     double median_value;  // Valor do plano de corte
     BSPNode* left;
@@ -16,7 +22,7 @@ struct BSPNode {
     BSPNode() : axis(-1), median_value(0), left(nullptr), right(nullptr) {}
 };
 
-//Formula para achar o valor do centro do triangulo
+
 
 
 
@@ -27,7 +33,7 @@ double getAxisValue(const vetor<double>& point, int axis) {
     return 0;  // Caso padrão
 }
 
-int chooseAxis(const std::vector<sphere_list>& spheres, const std::vector<malha>& triangles) {
+int chooseAxis(const vector<sphere_list>& spheres, const vector<malha>& triangles) {
     double x_variance = 0, y_variance = 0, z_variance = 0;
     int i = 0;  
     for (const auto& sphere : spheres) {
@@ -56,7 +62,7 @@ int chooseAxis(const std::vector<sphere_list>& spheres, const std::vector<malha>
     return 2;
 }
 
-BSPNode* buildBSP(const std::vector<sphere_list>& spheres, const std::vector<malha>& triangles, int depth = 0, int max_depth = 10) {
+BSPNode* buildBSP(const vector<sphere_list>& spheres, const vector<malha>& triangles, int depth = 0, int max_depth = 10) {
     if (spheres.empty() && triangles.empty()) return nullptr;
 
     auto node = new BSPNode();
@@ -70,7 +76,7 @@ BSPNode* buildBSP(const std::vector<sphere_list>& spheres, const std::vector<mal
     node->axis = axis;
 
     // Comparator para esferas
-    /*auto sphereComparator = [axis](const sphere_list& sphere1, const sphere_list& sphere2) {
+    auto sphereComparator = [axis](const sphere_list& sphere1, const sphere_list& sphere2) {
         return getAxisValue(sphere1.list[0].center, axis) < getAxisValue(sphere2.list[0].center, axis);
 
     };
@@ -79,34 +85,16 @@ BSPNode* buildBSP(const std::vector<sphere_list>& spheres, const std::vector<mal
     auto triangleComparator = [axis](const malha& malha1, const malha& malha2) {
         return getAxisValue(malha1.lista_triangulos[0].getCentro(), axis) < getAxisValue(malha2.lista_triangulos[0].getCentro(), axis);
     };
-    */
-   // Comparator para esferas
-    auto sphereComparator = [axis](const sphere_list& sphere1, const sphere_list& sphere2) {
-        for (size_t i = 0; i < sphere1.list.size() && i < sphere2.list.size(); ++i) {
-            if (getAxisValue(sphere1.list[i].center, axis) != getAxisValue(sphere2.list[i].center, axis)) {
-                return getAxisValue(sphere1.list[i].center, axis) < getAxisValue(sphere2.list[i].center, axis);
-            }
-        }
-        return sphere1.list.size() < sphere2.list.size();  // Caso todos sejam iguais, compare pelo tamanho da lista
-    };
-
-    // Comparator para malhas
-    auto triangleComparator = [axis](const malha& malha1, const malha& malha2) {
-        for (size_t i = 0; i < malha1.lista_triangulos.size() && i < malha2.lista_triangulos.size(); ++i) {
-            if (getAxisValue(malha1.lista_triangulos[i].getCentro(), axis) != getAxisValue(malha2.lista_triangulos[i].getCentro(), axis)) {
-                return getAxisValue(malha1.lista_triangulos[i].getCentro(), axis) < getAxisValue(malha2.lista_triangulos[i].getCentro(), axis);
-            }
-        }
-        return malha1.lista_triangulos.size() < malha2.lista_triangulos.size();  // Caso todos sejam iguais, compare pelo tamanho da lista
-    };
+    
+   
 
     // Ordenar as esferas
-    std::vector<sphere_list> sortedSpheres = spheres;
-    std::sort(sortedSpheres.begin(), sortedSpheres.end(), sphereComparator);
+    vector<sphere_list> sortedSpheres = spheres;
+    sort(sortedSpheres.begin(), sortedSpheres.end(), sphereComparator);
 
     // Ordenar as malhas
-    std::vector<malha> sortedTriangles = triangles;
-    std::sort(sortedTriangles.begin(), sortedTriangles.end(), triangleComparator);
+    vector<malha> sortedTriangles = triangles;
+    sort(sortedTriangles.begin(), sortedTriangles.end(), triangleComparator);
     
     size_t median_index = (sortedSpheres.size() + sortedTriangles.size()) / 2;
     if (median_index < sortedSpheres.size()) {
@@ -115,11 +103,21 @@ BSPNode* buildBSP(const std::vector<sphere_list>& spheres, const std::vector<mal
         node->median_value = getAxisValue(sortedTriangles[0].lista_triangulos[median_index - sortedSpheres.size()].getCentro(), axis);
     }
 
-    std::vector<sphere_list> leftSpheres(sortedSpheres.begin(), sortedSpheres.begin() + median_index);
-    std::vector<sphere_list> rightSpheres(sortedSpheres.begin() + median_index, sortedSpheres.end());
+    vector<sphere_list> leftSpheres(sortedSpheres.begin(), sortedSpheres.begin() + median_index);
+    vector<sphere_list> rightSpheres(sortedSpheres.begin() + median_index, sortedSpheres.end());
 
-    std::vector<malha> leftTriangles(sortedTriangles.begin(), sortedTriangles.begin() + median_index - leftSpheres.size());
-    std::vector<malha> rightTriangles(sortedTriangles.begin() + median_index - leftSpheres.size(), sortedTriangles.end());
+    vector<malha> leftTriangles(sortedTriangles.begin(), sortedTriangles.begin() + median_index - leftSpheres.size());
+    vector<malha> rightTriangles(sortedTriangles.begin() + median_index - leftSpheres.size(), sortedTriangles.end());
+
+    // Ajuste para evitar lados vazios
+    if (leftSpheres.empty() || rightSpheres.empty()) {
+        leftSpheres = sortedSpheres;
+        //rightSpheres.clear();
+    }
+    if (leftTriangles.empty() || rightTriangles.empty()) {
+        leftTriangles = sortedTriangles;
+        //rightTriangles.clear();
+    }
 
     node->left = buildBSP(leftSpheres, leftTriangles, depth + 1, max_depth);
     node->right = buildBSP(rightSpheres, rightTriangles, depth + 1, max_depth);
@@ -130,4 +128,4 @@ BSPNode* buildBSP(const std::vector<sphere_list>& spheres, const std::vector<mal
 
 
 
-
+#endif

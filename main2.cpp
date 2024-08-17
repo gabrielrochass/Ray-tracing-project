@@ -14,7 +14,7 @@
 #include "raio.h"
 #include "matriz4x4.h"
 #include "phongComponentes.h"
-#include "BSP2.h"
+#include "BSP.h"
 
 using namespace std;
 
@@ -34,45 +34,37 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
 bool intersectRayBSP(const raio<double>& ray, BSPNode* node, double t_min, double t_max, hit_record& rec) {
     if (!node) return false;
 
-    if (node->spheres.size() + node->triangles.size() + node->planos.size()> 0) {
+    if (node->spheres.size() + node->triangles.size() > 0) {
         hit_record tempRec;
-            bool hitAnything = false;
-            double closestSoFar = t_max;
+        bool hitAnything = false;
+        double closestSoFar = t_max;
 
-            for (const auto& sphere : node->spheres) {
-                if (sphere.hit(ray, t_min, closestSoFar, tempRec)) {
-                    hitAnything = true;
-                    closestSoFar = tempRec.t;
-                    rec = tempRec;
-                }
+        for (const auto& sphere : node->spheres) {
+            if (sphere.hit(ray, t_min, closestSoFar, tempRec)) {
+                hitAnything = true;
+                closestSoFar = tempRec.t;
+                rec = tempRec;
             }
-            
-            vetor<double> ponto = raioAt(ray, closestSoFar);
+        }
 
-            for (const auto& triangle : node->triangles) {
-                if (triangle.hit(ray, t_min, closestSoFar, tempRec)) {
-                    hitAnything = true;
-                    closestSoFar = tempRec.t;
-                    rec = tempRec;
-                }
+        for (const auto& triangle : node->triangles) {
+            if (triangle.hit(ray, t_min, closestSoFar, tempRec)) {
+                hitAnything = true;
+                closestSoFar = tempRec.t;
+                rec = tempRec;
             }
+        }
 
-            /*for (const auto& plano : node->planos) {
-                if (plano.hitPlano(ray, t_min, closestSoFar, tempRec)) {
-                    hitAnything = true;
-                    closestSoFar = tempRec.t;
-                    rec = tempRec;
-                }
-            }
-*/
-            return hitAnything;
+        return hitAnything;
     }
-
+    // tPlane é o valor de t onde o raio atinge o plano de secção
     double tPlane = (node->median_value - getAxisValue(ray.origem, node->axis)) / getAxisValue(ray.direcao, node->axis);
 
     BSPNode* firstChild;
     BSPNode* secondChild;
 
+    // Se o raio está indo na direção do plano de secção, o primeiro filho é o da esquerda e o segundo filho é o da direita
+    // Caso contrário, o primeiro filho é o da direita e o segundo filho é o da esquerda
     if (getAxisValue(ray.origem, node->axis) < node->median_value) {
         firstChild = node->left;
         secondChild = node->right;
@@ -81,20 +73,23 @@ bool intersectRayBSP(const raio<double>& ray, BSPNode* node, double t_min, doubl
         secondChild = node->left;
     }
 
+    // Se o raio não atinge o plano de secção, ele não atinge nenhum dos filhos
     if (tPlane > t_max || tPlane <= 0) {
         return intersectRayBSP(ray, firstChild, t_min, t_max, rec);
-    } else if (tPlane < t_min) {
+    } else if (tPlane < t_min) { // Se o raio atinge o plano de secção, ele atinge ambos os filhos
         return intersectRayBSP(ray, secondChild, t_min, t_max, rec);
-    } else {
-        if (intersectRayBSP(ray, firstChild, t_min, tPlane, rec)) {
+    } else { // Se o raio atinge o plano de secção, ele atinge ambos os filhos
+        if (intersectRayBSP(ray, firstChild, t_min, tPlane, rec)) { // Verifica se o raio atinge o primeiro filho
             return true;
         }
-        return intersectRayBSP(ray, secondChild, tPlane, t_max, rec);
+        return intersectRayBSP(ray, secondChild, tPlane, t_max, rec); // Verifica se o raio atinge o segundo filho
     }
 }
 
 vetor<double> raioColor(const raio<double>& r, BSPNode& root, const vetor<double>& origem, const listaLuzes& luzes, const phongComponentes& material, const phongComponentes& materialEsferas) {
     hit_record rec;
+    plano plano1(vetor<double>(0, 0, -1), vetor<double>(0, 0, 1));
+
     if (intersectRayBSP(r, &root, 0.001, infinity, rec)) {
         vetor<double> cor(0, 0, 0);
         for (const auto& luz : luzes.luzes) {
@@ -103,9 +98,12 @@ vetor<double> raioColor(const raio<double>& r, BSPNode& root, const vetor<double
             double difusa = produtoEscalar(rec.normal, direcaoLuz);
             if (difusa > 0) {
                 cor += multiplicacaoPorEscalar(multiplicacaoPorEscalar(luz.Id, material.kd), difusa);
-                //vetor<double> direcaoRefletida = refletir(direcaoLuz, rec.normal); o que seria esse refletir?
+
+                //Formula DR = 2 * (N . L) * N - L
                 vetor<double> direcaoRefletida = normal(subtracao(mult(2 * produtoEscalar(direcaoLuz, rec.normal), rec.normal), direcaoLuz));
-                double especular = produtoEscalar(r.direcao, direcaoRefletida);
+                //Formula especular = R . V
+                double especular = produtoEscalar(normal(subtracao(origem, rec.p)), direcaoRefletida); // Corrigir direção da câmera
+                //Formula Ks * (R . V)^n
                 if (especular > 0) {
                     cor += multiplicacaoPorEscalar(multiplicacaoPorEscalar(luz.Is, material.ks), pow(especular, material.n));
                 }
@@ -113,10 +111,9 @@ vetor<double> raioColor(const raio<double>& r, BSPNode& root, const vetor<double
         }
         return cor;
     }
-    else if (root.planos[0].hitPlano(r, 0.001, infinity, rec)) {
+    else if (plano1.hitPlano(r, 0.001, infinity, rec)) {
         return vetor<double>(1, 1, 1);
     }
-    
     return backgroundColor(r.direcao);
 }
 
@@ -187,14 +184,14 @@ int main() {
 
     
     // adiciona os triangulos ao mundo
-    // mundo.add(tri1);
-    // mundo.add(tri2);
-    // mundo.add(tri3);
-    // mundo.add(tri4);
+    mundo.add(tri1);
+    mundo.add(tri2);
+    mundo.add(tri3);
+    mundo.add(tri4);
   
-    mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
-    mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
-    mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
+    //mundo.add(triangulo(vetor<double>{0, 0, -1}, vetor<double>{0, -1, -1}, vetor<double>{1, 0, -1})); 
+    //mundo.add(triangulo(vetor<double>{-1, 0, -1}, vetor<double>{-1, -1, -1}, vetor<double>{0, 0, -1}));
+    //mundo.add(triangulo(vetor<double>{-2, 0, -1}, vetor<double>{-2, -1, -1}, vetor<double>{-1, 0, -1})); 
     
     // parâmetros da classe triangulo: vetor<double> v0, vetor<double> v1, vetor<double> v2
     // cada vetor<double> é um ponto no espaço 3D
@@ -249,10 +246,7 @@ int main() {
     esferass.push_back(esferas);
     vector<malha> mundos;
     mundos.push_back(mundo);
-    vector<plano> planos;
-    planos.push_back(plano(vetor<double>{0, 0.5, -1}, vetor<double>{0, 0, 1}));
-    //BSPNode* root = buildBSP(esferass, mundos);
-    BSPNode* root = buildBSP(esferass, mundos, planos);
+    BSPNode* root = buildBSP(esferass, mundos);
     
     // define a cor do fundo
     for (int j = 0; j < imHeight; ++j) {
@@ -262,7 +256,9 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            
+            // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
+            //vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
+            //Put the BSP structure in the new function raioColor
             vetor<double> color = raioColor(r, *root, camera.posicaoDaCamera, luzes, material, materialEsferas);
             image[j][i] = color;
         }
@@ -286,4 +282,3 @@ int main() {
     
     return 0;
 }
-
