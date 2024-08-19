@@ -109,6 +109,13 @@ vetor<double> raioColor(const raio<double>& r, BSPNode& root, const vetor<double
                 }
             }
         }
+        // vetor<double> p = raioAt(r, rec.t);
+        // vetor<double> N = vetorUni(rec.normal);
+
+        // for (int i = 0; i < luzes.luzes.size(); i++) {
+            
+        //     cor = cor + calcularIluminacaoPhong(p, N, origem, luzes.luzes[i], luzes, material, root.spheres[0], plano1, 2);
+        // }
         return cor;
     }
     else if (plano1.hitPlano(r, 0.001, infinity, rec)) {
