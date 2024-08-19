@@ -11,7 +11,7 @@
 using namespace std;
 
 struct BSPNode {
-    
+
     vector<sphere_list> spheres;
     vector<malha> triangles;
     int axis;  // Eixo de divisão
@@ -19,6 +19,7 @@ struct BSPNode {
     BSPNode* left;
     BSPNode* right;
 
+    //indicado em -1 para determinar indefinição
     BSPNode() : axis(-1), median_value(0), left(nullptr), right(nullptr) {}
 };
 
@@ -26,16 +27,16 @@ struct BSPNode {
 
 
 
-double getAxisValue(const vetor<double>& point, int axis) {
+double getAxisValue(const vetor<double>& point, int axis) { // retornar o valor do ponto no eixo
     if (axis == 0) return point.x;
     if (axis == 1) return point.y;
     if (axis == 2) return point.z;
-    return 0;  // Caso padrão
+    return 0;  
 }
 
-int chooseAxis(const vector<sphere_list>& spheres, const vector<malha>& triangles) {
+int chooseAxis(const vector<sphere_list>& spheres, const vector<malha>& triangles) { 
     double x_variance = 0, y_variance = 0, z_variance = 0;
-    int i = 0;  
+    int i = 0;  // escolher o eixo com maior variância
     for (const auto& sphere : spheres) {
 
         vetor<double> center = sphere.list[i].center;
@@ -61,6 +62,15 @@ int chooseAxis(const vector<sphere_list>& spheres, const vector<malha>& triangle
     if (y_variance >= x_variance && y_variance >= z_variance) return 1;
     return 2;
 }
+
+//Como funciona a função buildBSP
+//A função buildBSP é responsável por construir a BSP (Binary Space Partitioning) a partir de uma lista dos objetos da cena.
+//A BSP é uma árvore binária que divide o espaço em partições, de forma que cada nó da árvore representa um plano de corte que divide o espaço em dois subespaços.
+//recebe como parâmetro uma lista dos objetos, e retorna um ponteiro para o nó raiz da BSP.
+//A função buildBSP é recursiva, e a cada chamada ela escolhe um eixo de divisão (x, y ou z) baseado na variância dos centros dos objetos da cena.
+//Em seguida, ela ordena as esferas e triângulos de acordo com o eixo de divisão escolhido, e calcula a mediana dos valores dos centros dos objetos.
+//A função então divide a lista em duas partes, uma contendo os objetos cujo centro é menor ou igual à mediana, e outra contendo os objetos cujo centro é maior que a mediana.
+//termina quando a lista é vazia, ou quando o número de objetos é menor ou igual a 1, ou quando a profundidade máxima da BSP é atingida.
 
 BSPNode* buildBSP(const vector<sphere_list>& spheres, const vector<malha>& triangles, int depth = 0, int max_depth = 10) {
     if (spheres.empty() && triangles.empty()) return nullptr;
@@ -94,7 +104,7 @@ BSPNode* buildBSP(const vector<sphere_list>& spheres, const vector<malha>& trian
 
     // Ordenar as malhas
     vector<malha> sortedTriangles = triangles;
-    sort(sortedTriangles.begin(), sortedTriangles.end(), triangleComparator);
+    std::sort(sortedTriangles.begin(), sortedTriangles.end(), triangleComparator);
     
     size_t median_index = (sortedSpheres.size() + sortedTriangles.size()) / 2;
     if (median_index < sortedSpheres.size()) {
