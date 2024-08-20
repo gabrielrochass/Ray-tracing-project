@@ -256,9 +256,6 @@ int main() {
             
             vetor<double> direcaoDoRaio = subtracao(camera.posicaoDaCamera, soma(cantoEsquerdoTela, soma(mult(u, larguraDaViewport), mult(v, alturaDaViewport))));
             raio<double> r(camera.posicaoDaCamera, direcaoDoRaio);
-            // vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luz, material);
-            //vetor<double> color = raioColor(r, mundo, esferas, camera.posicaoDaCamera, luzes, material, materialEsferas);
-            //Put the BSP structure in the new function raioColor
             vetor<double> color = raioColor(r, *root, camera.posicaoDaCamera, luzes, material, materialEsferas);
             image[j][i] = color;
         }
