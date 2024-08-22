@@ -20,7 +20,6 @@
 using namespace std;
 
 const double infinity = numeric_limits<double>::infinity();
-const double pi = 3.14159265358979323846;
 
 // define a cor do fundo
 vetor<double> backgroundColor(const vetor<double>& dir) {
@@ -36,7 +35,7 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
     vetor<double> corFinal = {0.0, 0.0, 0.0};
     bool hitAnything = false;
     double t_closest = infinity;
-    const sphere* hit_sphere = nullptr;
+    const sphere* hit_sphere = nullptr; // ponteiro para a esfera atingida
 
     plano plano1(vetor<double>{0.0, 0.0, -1.0}, vetor<double>{0.0, 1.0, 0.0});
 
@@ -57,17 +56,13 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
 
         // UV mapping
         vetor<double> uv = hit_sphere->obterCoordenadasUV(p - hit_sphere->center);
-        vetor<double> corTextura = hit_sphere->textura ? hit_sphere->textura->corTextura(uv.x, uv.y) : rec.cor; // se a esfera tiver textura, usa a cor da textura, senão usa a cor padrão
-        corFinal = corTextura;
-        return corFinal;
-
-    } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {
-        vetor<double> p = raioAt(raio, rec.t);
-        vetor<double> N = vetorUni(rec.normal);
-
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            corFinal = corFinal + calcularIluminacaoPhongPlano(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, material, plano1, esferas, 2);
+        vetor<double> corTextura;
+        if (hit_sphere->textura) {
+            corTextura = hit_sphere->textura->corTextura(uv.x, uv.y);
+        } else {
+            corTextura = rec.cor;
         }
+        corFinal = corTextura;
         return corFinal;
     }
 
@@ -96,17 +91,11 @@ int main() {
     const Textura* textura4 = new Textura("texturas/moana.bmp");
     const Textura* textura5 = new Textura("texturas/jupter.bmp");
 
-
+    // define as esferas
     sphere_list esferas;
     esferas.add(sphere(vetor<double>{0, 0, -1}, 1, textura1)); // Esfera central
     esferas.add(sphere(vetor<double>{1.7, 0, -1}, 0.7, textura3));
     esferas.add(sphere(vetor<double>{-1.7, 0, -1}, 0.7, textura5));
-
-
-    // futuras esferas (?)
-    // esferas.add(sphere(vetor<double>{0, 0, -1}, 1, vetor<double>{0, 1, 0})); // Esfera central
-    // esferas.add(sphere(vetor<double>{1.5, 0, -1}, 0.7, vetor<double>{0, 1, 0})); 
-    // esferas.add(sphere(vetor<double>{-1.5, 0, -1}, 0.7, vetor<double>{0, 0, 1})); 
 
     // Define a iluminação e o material
     iluminacao luz{

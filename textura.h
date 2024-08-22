@@ -1,3 +1,6 @@
+// a ideia é pegar a textura (imagem 2d) e aplicar em um objeto 3d -> como montar um cubo na escola
+// mapear a textura em um objeto 3d -> coordenadas UV 
+
 #ifndef TEXTURA_H
 #define TEXTURA_H
 
