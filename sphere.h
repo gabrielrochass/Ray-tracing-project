@@ -57,10 +57,11 @@ bool sphere::hit(const raio<double>& raio, double t_min, double t_max, hit_recor
 
 vetor<double> sphere::obterCoordenadasUV(const vetor<double>& pontoDeIntersecao) const {
     const double pi = 3.14159265358979323846;
-    double phi = atan2(pontoDeIntersecao.z, pontoDeIntersecao.x);
-    double theta = asin(pontoDeIntersecao.y);
+    double phi = atan2(pontoDeIntersecao.z, pontoDeIntersecao.x); // atan2 retorna o arco tangente (ângulo) entre o eixo x e o ponto de interseção no plano xz
+    double theta = asin(pontoDeIntersecao.y); // asin retorna o arco seno (ângulo) entre o eixo y e o ponto de interseção no plano yz
 
-    double u = 1 - (phi + pi) / (2 * pi);
+    // mapeia os ângulos phi e theta para as coordenadas UV da textura normalizadas
+    double u = 1 - (phi + pi) / (2 * pi); 
     double v = (theta + pi / 2) / pi;
 
     return vetor<double>(u, v, 0);

@@ -30,17 +30,6 @@ vetor<double> backgroundColor(const vetor<double>& dir) {
                          (1 - t) * 1.0 + t * 1.0);
 }
 
-// mapeia coordenadas esféricas para coordenadas uv
-vetor<double> calularCoordenadasUV(const vetor<double>& pontoDeIntersecao) {
-    double phi = atan2(pontoDeIntersecao.z, pontoDeIntersecao.x);
-    double theta = asin(pontoDeIntersecao.y);
-
-    double u = 1 - (phi + pi) / (2 * pi);
-    double v = (theta + pi / 2) / pi;
-
-    return vetor<double>(u, v, 0);
-} 
-
 // calcula a cor de um pixel
 vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, const vetor<double>& posicaoObservador, listaLuzes luzes, const phongComponentes& material, const phongComponentes& materialEsf) {
     hit_record rec;
@@ -68,13 +57,8 @@ vetor<double> raioColor(const raio<double>& raio, const sphere_list& esferas, co
 
         // UV mapping
         vetor<double> uv = hit_sphere->obterCoordenadasUV(p - hit_sphere->center);
-        vetor<double> corTextura = hit_sphere->textura ? hit_sphere->textura->corTextura(uv.x, uv.y) : rec.cor;
+        vetor<double> corTextura = hit_sphere->textura ? hit_sphere->textura->corTextura(uv.x, uv.y) : rec.cor; // se a esfera tiver textura, usa a cor da textura, senão usa a cor padrão
         corFinal = corTextura;
-
-        // Adiciona a iluminação
-        for (int i = 0; i < luzes.luzes.size(); i++) {
-            // corFinal = corFinal + calcularIluminacaoPhong(p, N, posicaoObservador, luzes.acessarLuz(i), luzes, materialEsf, esferas, plano1, 1);
-        }
         return corFinal;
 
     } else if (plano1.hitPlano(raio, 0.001, infinity, rec)) {

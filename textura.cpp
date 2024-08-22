@@ -19,7 +19,7 @@ Textura::Textura(const string& arquivo) {
 
         // lê a paleta de cores da imagem e armazena em textura (matriz de cores)
         for (int i = 0; i < altura; i++) {
-            textura[i].resize(largura);
+            textura[i].resize(largura); // redimensiona a linha da matriz
             for (int j = 0; j < largura; j++) {
                 uint8_t cor[3];
                 arquivoTextura.read((char*)&cor, sizeof(cor));
