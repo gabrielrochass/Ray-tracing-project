@@ -102,7 +102,7 @@ vetor<double> calcularIluminacaoPhong(
     iluminacao luz, 
     listaLuzes luzes,
     phongComponentes material,
-    sphere_list esferas
+    malha malha
 )
 {
     // Vetores de direção
@@ -120,7 +120,7 @@ vetor<double> calcularIluminacaoPhong(
         raio<double> raioSombra(pontoIntersecao, L);
         bool emSombra = false;
         hit_record temp_rec;
-        if (esferas.hit(raioSombra, 0.001, infinito, temp_rec)) {
+        if (malha.hit(raioSombra, 0.001, infinito, temp_rec)) {
             emSombra = true;
         }
 
